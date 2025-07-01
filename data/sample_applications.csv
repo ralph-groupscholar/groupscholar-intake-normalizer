@@ -1,0 +1,6 @@
+applicant_id,name,email,program,gpa,income_bracket,submission_date,first_gen,eligibility_notes
+A-101,Jordan Lee,jordan.lee@example.com,STEM Scholars,3.6,<=40k,2026-01-20,yes,Strong community leadership
+A-102,Maya Patel,,Arts Catalyst,2.4,40k-70k,2026/01/18,no,Missing essay draft
+A-103,Sam Rivera,sam.rivera@example.com,STEM scholars,3.1,,2026-01-12,yes,Income verification pending
+A-104,Anika Bose,anika.bose@example.com,Health Futures,3.9,70k-100k,2026-01-05,no,All docs complete
+A-105,Chris Nguyen,chris.nguyen@example.com,arts catalyst,2.9,<=40k,2025-12-29,yes,Needs recommendation letter

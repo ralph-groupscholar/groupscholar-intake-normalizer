@@ -1,0 +1,67 @@
+[
+  {
+    "applicant_id": "A-101",
+    "name": "Jordan Lee",
+    "email": "jordan.lee@example.com",
+    "program": "STEM Scholars",
+    "gpa": 3.6,
+    "income_bracket": "<=40k",
+    "submission_date": "2026-01-20",
+    "first_gen": true,
+    "eligibility_notes": "Strong community leadership",
+    "flags": []
+  },
+  {
+    "applicant_id": "A-102",
+    "name": "Maya Patel",
+    "email": null,
+    "program": "Arts Catalyst",
+    "gpa": 2.4,
+    "income_bracket": "40k-70k",
+    "submission_date": "2026-01-18",
+    "first_gen": false,
+    "eligibility_notes": "Missing essay draft",
+    "flags": [
+      "missing_email",
+      "low_gpa"
+    ]
+  },
+  {
+    "applicant_id": "A-103",
+    "name": "Sam Rivera",
+    "email": "sam.rivera@example.com",
+    "program": "STEM Scholars",
+    "gpa": 3.1,
+    "income_bracket": null,
+    "submission_date": "2026-01-12",
+    "first_gen": true,
+    "eligibility_notes": "Income verification pending",
+    "flags": [
+      "missing_income"
+    ]
+  },
+  {
+    "applicant_id": "A-104",
+    "name": "Anika Bose",
+    "email": "anika.bose@example.com",
+    "program": "Health Futures",
+    "gpa": 3.9,
+    "income_bracket": "70k-100k",
+    "submission_date": "2026-01-05",
+    "first_gen": false,
+    "eligibility_notes": "All docs complete",
+    "flags": []
+  },
+  {
+    "applicant_id": "A-105",
+    "name": "Chris Nguyen",
+    "email": "chris.nguyen@example.com",
+    "program": "Arts Catalyst",
+    "gpa": 2.9,
+    "income_bracket": "<=40k",
+    "submission_date": "2025-12-29",
+    "first_gen": true,
+    "eligibility_notes": "Needs recommendation letter",
+    "flags": []
+  }
+]
