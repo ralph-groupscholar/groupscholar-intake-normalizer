@@ -37,7 +37,9 @@
     "first_gen": true,
     "eligibility_notes": "Income verification pending",
     "flags": [
-      "missing_income"
+      "missing_income",
+      "duplicate_email",
+      "duplicate_applicant_id"
     ]
   },
   {
@@ -63,5 +65,50 @@
     "first_gen": true,
     "eligibility_notes": "Needs recommendation letter",
     "flags": []
+  },
+  {
+    "applicant_id": "A-103",
+    "name": "",
+    "email": "sam.rivera@example.com",
+    "program": "STEM Scholars",
+    "gpa": 3.1,
+    "income_bracket": "<=40k",
+    "submission_date": "2026-01-15",
+    "first_gen": true,
+    "eligibility_notes": "Duplicate resubmission without name",
+    "flags": [
+      "missing_name",
+      "duplicate_email",
+      "duplicate_applicant_id"
+    ]
+  },
+  {
+    "applicant_id": "A-106",
+    "name": "Lila Chen",
+    "email": "lila.chen_at_example.com",
+    "program": "Health Futures",
+    "gpa": 3.4,
+    "income_bracket": "40k-70k",
+    "submission_date": "2026-02-02",
+    "first_gen": false,
+    "eligibility_notes": "Email format off",
+    "flags": [
+      "invalid_email"
+    ]
+  },
+  {
+    "applicant_id": "A-107",
+    "name": "Noah Ortiz",
+    "email": "noah.ortiz@example.com",
+    "program": "Unspecified",
+    "gpa": 4.6,
+    "income_bracket": "<=40k",
+    "submission_date": "2026-01-25",
+    "first_gen": false,
+    "eligibility_notes": "GPA needs review",
+    "flags": [
+      "missing_program",
+      "gpa_out_of_range"
+    ]
   }
 ]

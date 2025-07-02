@@ -1,0 +1,36 @@
+{
+  "total_rows": 8,
+  "flagged_applications": 5,
+  "flagged_rate": 62.5,
+  "flag_rates": {
+    "missing_email": 0.125,
+    "low_gpa": 0.125,
+    "missing_income": 0.125,
+    "duplicate_email": 0.25,
+    "duplicate_applicant_id": 0.25,
+    "missing_name": 0.125,
+    "invalid_email": 0.125,
+    "missing_program": 0.125,
+    "gpa_out_of_range": 0.125
+  },
+  "program_counts": {
+    "STEM Scholars": 3,
+    "Arts Catalyst": 2,
+    "Health Futures": 2,
+    "Unspecified": 1
+  },
+  "program_gpa_avg": {
+    "STEM Scholars": 3.27,
+    "Arts Catalyst": 2.65,
+    "Health Futures": 3.65,
+    "Unspecified": 4.6
+  },
+  "email_domain_counts": {
+    "example.com": 6
+  },
+  "gpa_avg": 3.38,
+  "gpa_min": 2.4,
+  "gpa_max": 4.6,
+  "submission_start": "2025-12-29",
+  "submission_end": "2026-02-02"
+}

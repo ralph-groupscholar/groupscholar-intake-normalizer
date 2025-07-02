@@ -1,19 +1,33 @@
 # Intake Normalization Summary
 
-Total applications: 5
+Total applications: 8
 Missing applicant ID: 0
+Missing applicant name: 1
 Missing email: 1
-Invalid email: 0
+Invalid email: 1
+Missing program: 1
 Missing income: 1
 Low GPA (<2.5): 1
 Invalid GPA: 0
-First-gen applicants: 3
+GPA out of range: 1
+GPA average: 3.38
+GPA range: 2.4 to 4.6
+First-gen applicants: 4
 Invalid submission date: 0
 Future submission date: 0
-Duplicate emails: 0
-Submission window: 2025-12-29 to 2026-01-20
+Duplicate emails: 1
+Duplicate applicant IDs: 1
+Flagged applications: 5 (62.5%)
+Submission window: 2025-12-29 to 2026-02-02
 
 ## Applications by program
 - Arts Catalyst: 2
-- Health Futures: 1
-- STEM Scholars: 2
+- Health Futures: 2
+- STEM Scholars: 3
+- Unspecified: 1
+
+## GPA by program
+- Arts Catalyst: 2.65
+- Health Futures: 3.65
+- STEM Scholars: 3.27
+- Unspecified: 4.6
