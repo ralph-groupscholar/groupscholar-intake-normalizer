@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   submission_start DATE,
   submission_end DATE,
   program_counts JSONB NOT NULL,
-  program_gpa_avg JSONB NOT NULL
+  program_gpa_avg JSONB NOT NULL,
+  income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb
 );
 
 CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
@@ -62,4 +63,5 @@ ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS gpa_avg NUMERIC(4, 2),
   ADD COLUMN IF NOT EXISTS gpa_min NUMERIC(4, 2),
   ADD COLUMN IF NOT EXISTS gpa_max NUMERIC(4, 2),
-  ADD COLUMN IF NOT EXISTS program_gpa_avg JSONB NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS program_gpa_avg JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb;

@@ -72,7 +72,8 @@ def insert_batch(
                 submission_start,
                 submission_end,
                 program_counts,
-                program_gpa_avg
+                program_gpa_avg,
+                income_bracket_counts
             ) VALUES (
                 %(batch_id)s,
                 %(batch_label)s,
@@ -99,7 +100,8 @@ def insert_batch(
                 %(submission_start)s,
                 %(submission_end)s,
                 %(program_counts)s,
-                %(program_gpa_avg)s
+                %(program_gpa_avg)s,
+                %(income_bracket_counts)s
             )
             """,
             {
@@ -129,6 +131,7 @@ def insert_batch(
                 "submission_end": summary.submission_end,
                 "program_counts": Json(summary.program_counts),
                 "program_gpa_avg": Json(summary.program_gpa_avg),
+                "income_bracket_counts": Json(summary.income_bracket_counts),
             },
         )
 

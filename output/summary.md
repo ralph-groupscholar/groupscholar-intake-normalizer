@@ -31,3 +31,8 @@ Submission window: 2025-12-29 to 2026-02-02
 - Health Futures: 3.65
 - STEM Scholars: 3.27
 - Unspecified: 4.6
+
+## Applications by income bracket
+- 40k-70k: 2
+- 70k-100k: 1
+- <=40k: 4

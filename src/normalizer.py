@@ -2,6 +2,7 @@
 import argparse
 import csv
 import json
+import re
 from dataclasses import asdict
 from datetime import date, datetime
 from pathlib import Path
@@ -14,6 +15,22 @@ PROGRAM_ALIASES = {
     "stem scholars": "STEM Scholars",
     "arts catalyst": "Arts Catalyst",
     "health futures": "Health Futures",
+}
+INCOME_ALIASES = {
+    "<=40k": "<=40k",
+    "<40k": "<=40k",
+    "under40k": "<=40k",
+    "0-40k": "<=40k",
+    "40k-70k": "40k-70k",
+    "40kto70k": "40k-70k",
+    "40k–70k": "40k-70k",
+    "70k-100k": "70k-100k",
+    "70kto100k": "70k-100k",
+    "70k–100k": "70k-100k",
+    "100k+": "100k+",
+    "100kplus": "100k+",
+    ">=100k": "100k+",
+    ">100k": "100k+",
 }
 HEADER_ALIASES = {
     "applicant id": "applicant_id",
@@ -59,6 +76,43 @@ def parse_bool(value: str) -> bool:
     return value.strip().lower() in {"yes", "y", "true", "1"}
 
 
+def normalize_income_bracket(value: str) -> Optional[str]:
+    if not value:
+        return None
+    raw = value.strip()
+    if not raw:
+        return None
+    key = raw.lower().replace(" ", "").replace("$", "").replace(",", "")
+    alias = INCOME_ALIASES.get(key)
+    if alias:
+        return alias
+
+    range_match = re.match(r"^(\d+)(k)?-(\d+)(k)?$", key)
+    if range_match:
+        low = int(range_match.group(1)) * (1000 if range_match.group(2) else 1)
+        high = int(range_match.group(3)) * (1000 if range_match.group(4) else 1)
+        if high <= 40000:
+            return "<=40k"
+        if high <= 70000:
+            return "40k-70k"
+        if high <= 100000:
+            return "70k-100k"
+        return "100k+"
+
+    bound_match = re.match(r"^(<=|>=|<|>)(\d+)(k)?$", key)
+    if bound_match:
+        amount = int(bound_match.group(2)) * (1000 if bound_match.group(3) else 1)
+        if amount <= 40000:
+            return "<=40k"
+        if amount <= 70000:
+            return "40k-70k"
+        if amount <= 100000:
+            return "70k-100k"
+        return "100k+"
+
+    return raw
+
+
 def parse_gpa(value: str) -> Tuple[Optional[float], bool]:
     if not value:
         return None, False
@@ -102,7 +156,7 @@ def read_applications(path: Path) -> List[Dict[str, str]]:
 
 def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     email = row.get("email", "").strip() or None
-    income = row.get("income_bracket", "").strip() or None
+    income = normalize_income_bracket(row.get("income_bracket", ""))
     gpa, invalid_gpa = parse_gpa(row.get("gpa", ""))
     raw_program = row.get("program", "").strip()
     program = normalize_program(raw_program) if raw_program else "Unspecified"
@@ -179,6 +233,7 @@ def build_summary(
 ) -> Summary:
     program_counts: Dict[str, int] = {}
     program_gpas: Dict[str, List[float]] = {}
+    income_bracket_counts: Dict[str, int] = {}
     missing_applicant_id = 0
     missing_name = 0
     missing_email = 0
@@ -200,6 +255,8 @@ def build_summary(
         if app.gpa is not None:
             gpas.append(app.gpa)
             program_gpas.setdefault(app.program, []).append(app.gpa)
+        if app.income_bracket:
+            income_bracket_counts[app.income_bracket] = income_bracket_counts.get(app.income_bracket, 0) + 1
         if "missing_applicant_id" in app.flags:
             missing_applicant_id += 1
         if "missing_name" in app.flags:
@@ -263,6 +320,7 @@ def build_summary(
         gpa_max=gpa_max,
         program_counts=program_counts,
         program_gpa_avg=program_gpa_avg,
+        income_bracket_counts=income_bracket_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -309,6 +367,10 @@ def write_report(summary: Summary, path: Path) -> None:
     lines.append("## GPA by program")
     for program, avg in sorted(summary.program_gpa_avg.items()):
         lines.append(f"- {program}: {avg if avg is not None else 'n/a'}")
+    lines.append("")
+    lines.append("## Applications by income bracket")
+    for bracket, count in sorted(summary.income_bracket_counts.items()):
+        lines.append(f"- {bracket}: {count}")
     lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -391,6 +453,7 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         flag_rates=flag_rates,
         program_counts=summary.program_counts,
         program_gpa_avg=summary.program_gpa_avg,
+        income_bracket_counts=summary.income_bracket_counts,
         email_domain_counts=dict(sorted(email_domains.items(), key=lambda item: item[1], reverse=True)),
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,

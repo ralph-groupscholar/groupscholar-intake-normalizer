@@ -25,6 +25,11 @@
     "Health Futures": 3.65,
     "Unspecified": 4.6
   },
+  "income_bracket_counts": {
+    "<=40k": 4,
+    "40k-70k": 2,
+    "70k-100k": 1
+  },
   "email_domain_counts": {
     "example.com": 6
   },

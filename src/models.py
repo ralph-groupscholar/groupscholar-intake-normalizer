@@ -42,6 +42,7 @@ class Summary:
     gpa_max: Optional[float]
     program_counts: Dict[str, int]
     program_gpa_avg: Dict[str, Optional[float]]
+    income_bracket_counts: Dict[str, int]
     submission_start: Optional[str]
     submission_end: Optional[str]
 
@@ -54,6 +55,7 @@ class Scorecard:
     flag_rates: Dict[str, float]
     program_counts: Dict[str, int]
     program_gpa_avg: Dict[str, Optional[float]]
+    income_bracket_counts: Dict[str, int]
     email_domain_counts: Dict[str, int]
     gpa_avg: Optional[float]
     gpa_min: Optional[float]

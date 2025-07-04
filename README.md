@@ -7,7 +7,7 @@ Normalize scholarship intake CSV files into a consistent JSON payload with light
 - Parses an intake CSV and standardizes fields (dates, program names, booleans).
 - Normalizes column headers (common aliases) to reduce prep work.
 - Generates a normalized JSON dataset for downstream dashboards.
-- Produces a summary report with risk flags, GPA stats, submission window, and duplicate counts.
+- Produces a summary report with risk flags, GPA stats, income bracket mix, submission window, and duplicate counts.
 - Optional scorecard JSON for downstream QA automation.
 - Flags missing programs and out-of-range GPAs for follow-up.
 

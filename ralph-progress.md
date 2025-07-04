@@ -19,3 +19,13 @@
 - Added missing-program and GPA out-of-range validation with new summary metrics.
 - Updated database schema + batch export to store the new quality indicators.
 - Refreshed sample intake data and regenerated output artifacts with new flags.
+
+## Iteration 4
+- Moved shared data models into a dedicated module and aligned Postgres export imports.
+- Hardened schema initialization to apply multi-statement migrations reliably.
+- Seeded the production intake_normalizer tables with the latest sample intake batch.
+
+## Iteration 4
+- Normalized income brackets into standard bands and added income mix reporting to summaries/scorecards.
+- Stored income bracket counts in Postgres batch exports and refreshed sample outputs.
+- Fixed model coverage for summary fields to align with export payloads.
