@@ -29,3 +29,7 @@
 - Normalized income brackets into standard bands and added income mix reporting to summaries/scorecards.
 - Stored income bracket counts in Postgres batch exports and refreshed sample outputs.
 - Fixed model coverage for summary fields to align with export payloads.
+
+## Iteration 5
+- Ran the Postgres seed export for the latest sample intake batch to refresh production data.
+- Verified the schema migration script applies cleanly with multi-statement execution.
