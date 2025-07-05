@@ -15,6 +15,7 @@ class NormalizedApplication:
     submission_date: Optional[str]
     first_gen: bool
     eligibility_notes: Optional[str]
+    note_tags: List[str]
     flags: List[str]
 
 
@@ -43,6 +44,7 @@ class Summary:
     program_counts: Dict[str, int]
     program_gpa_avg: Dict[str, Optional[float]]
     income_bracket_counts: Dict[str, int]
+    note_tag_counts: Dict[str, int]
     submission_start: Optional[str]
     submission_end: Optional[str]
 
@@ -57,6 +59,7 @@ class Scorecard:
     program_gpa_avg: Dict[str, Optional[float]]
     income_bracket_counts: Dict[str, int]
     email_domain_counts: Dict[str, int]
+    note_tag_counts: Dict[str, int]
     gpa_avg: Optional[float]
     gpa_min: Optional[float]
     gpa_max: Optional[float]

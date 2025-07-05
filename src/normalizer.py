@@ -32,6 +32,13 @@ INCOME_ALIASES = {
     ">=100k": "100k+",
     ">100k": "100k+",
 }
+NOTE_TAG_RULES = {
+    "missing_essay": ["missing essay", "essay draft", "essay missing"],
+    "missing_recommendation": ["missing recommendation", "needs recommendation", "recommendation letter"],
+    "income_verification_pending": ["income verification pending", "income verification"],
+    "documents_complete": ["all docs complete", "docs complete", "documents complete"],
+    "gpa_review": ["gpa needs review", "gpa review"],
+}
 HEADER_ALIASES = {
     "applicant id": "applicant_id",
     "application id": "applicant_id",
@@ -122,6 +129,19 @@ def parse_gpa(value: str) -> Tuple[Optional[float], bool]:
         return None, True
 
 
+def extract_note_tags(value: Optional[str]) -> List[str]:
+    if not value:
+        return []
+    text = value.strip().lower()
+    if not text:
+        return []
+    tags: List[str] = []
+    for tag, phrases in NOTE_TAG_RULES.items():
+        if any(phrase in text for phrase in phrases):
+            tags.append(tag)
+    return tags
+
+
 def normalize_row_keys(row: Dict[str, str]) -> Dict[str, str]:
     normalized: Dict[str, str] = {}
     for key, value in row.items():
@@ -160,6 +180,8 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     gpa, invalid_gpa = parse_gpa(row.get("gpa", ""))
     raw_program = row.get("program", "").strip()
     program = normalize_program(raw_program) if raw_program else "Unspecified"
+    eligibility_notes = row.get("eligibility_notes", "").strip() or None
+    note_tags = extract_note_tags(eligibility_notes)
     flags = []
     if not row.get("applicant_id", "").strip():
         flags.append("missing_applicant_id")
@@ -195,7 +217,8 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         income_bracket=income,
         submission_date=submission,
         first_gen=parse_bool(row.get("first_gen", "")),
-        eligibility_notes=row.get("eligibility_notes", "").strip() or None,
+        eligibility_notes=eligibility_notes,
+        note_tags=note_tags,
         flags=flags,
     )
 
@@ -234,6 +257,7 @@ def build_summary(
     program_counts: Dict[str, int] = {}
     program_gpas: Dict[str, List[float]] = {}
     income_bracket_counts: Dict[str, int] = {}
+    note_tag_counts: Dict[str, int] = {}
     missing_applicant_id = 0
     missing_name = 0
     missing_email = 0
@@ -257,6 +281,9 @@ def build_summary(
             program_gpas.setdefault(app.program, []).append(app.gpa)
         if app.income_bracket:
             income_bracket_counts[app.income_bracket] = income_bracket_counts.get(app.income_bracket, 0) + 1
+        if app.note_tags:
+            for tag in app.note_tags:
+                note_tag_counts[tag] = note_tag_counts.get(tag, 0) + 1
         if "missing_applicant_id" in app.flags:
             missing_applicant_id += 1
         if "missing_name" in app.flags:
@@ -321,6 +348,7 @@ def build_summary(
         program_counts=program_counts,
         program_gpa_avg=program_gpa_avg,
         income_bracket_counts=income_bracket_counts,
+        note_tag_counts=note_tag_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -371,6 +399,13 @@ def write_report(summary: Summary, path: Path) -> None:
     lines.append("## Applications by income bracket")
     for bracket, count in sorted(summary.income_bracket_counts.items()):
         lines.append(f"- {bracket}: {count}")
+    lines.append("")
+    lines.append("## Eligibility note tags")
+    if summary.note_tag_counts:
+        for tag, count in sorted(summary.note_tag_counts.items()):
+            lines.append(f"- {tag.replace('_', ' ').title()}: {count}")
+    else:
+        lines.append("- n/a")
     lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -455,6 +490,7 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         program_gpa_avg=summary.program_gpa_avg,
         income_bracket_counts=summary.income_bracket_counts,
         email_domain_counts=dict(sorted(email_domains.items(), key=lambda item: item[1], reverse=True)),
+        note_tag_counts=summary.note_tag_counts,
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,
         gpa_max=summary.gpa_max,

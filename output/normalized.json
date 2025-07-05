@@ -9,6 +9,7 @@
     "submission_date": "2026-01-20",
     "first_gen": true,
     "eligibility_notes": "Strong community leadership",
+    "note_tags": [],
     "flags": []
   },
   {
@@ -21,6 +22,9 @@
     "submission_date": "2026-01-18",
     "first_gen": false,
     "eligibility_notes": "Missing essay draft",
+    "note_tags": [
+      "missing_essay"
+    ],
     "flags": [
       "missing_email",
       "low_gpa"
@@ -36,6 +40,9 @@
     "submission_date": "2026-01-12",
     "first_gen": true,
     "eligibility_notes": "Income verification pending",
+    "note_tags": [
+      "income_verification_pending"
+    ],
     "flags": [
       "missing_income",
       "duplicate_email",
@@ -52,6 +59,9 @@
     "submission_date": "2026-01-05",
     "first_gen": false,
     "eligibility_notes": "All docs complete",
+    "note_tags": [
+      "documents_complete"
+    ],
     "flags": []
   },
   {
@@ -64,6 +74,9 @@
     "submission_date": "2025-12-29",
     "first_gen": true,
     "eligibility_notes": "Needs recommendation letter",
+    "note_tags": [
+      "missing_recommendation"
+    ],
     "flags": []
   },
   {
@@ -76,6 +89,7 @@
     "submission_date": "2026-01-15",
     "first_gen": true,
     "eligibility_notes": "Duplicate resubmission without name",
+    "note_tags": [],
     "flags": [
       "missing_name",
       "duplicate_email",
@@ -92,6 +106,7 @@
     "submission_date": "2026-02-02",
     "first_gen": false,
     "eligibility_notes": "Email format off",
+    "note_tags": [],
     "flags": [
       "invalid_email"
     ]
@@ -106,6 +121,9 @@
     "submission_date": "2026-01-25",
     "first_gen": false,
     "eligibility_notes": "GPA needs review",
+    "note_tags": [
+      "gpa_review"
+    ],
     "flags": [
       "missing_program",
       "gpa_out_of_range"

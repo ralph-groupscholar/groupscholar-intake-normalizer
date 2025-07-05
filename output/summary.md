@@ -36,3 +36,10 @@ Submission window: 2025-12-29 to 2026-02-02
 - 40k-70k: 2
 - 70k-100k: 1
 - <=40k: 4
+
+## Eligibility note tags
+- Documents Complete: 1
+- Gpa Review: 1
+- Income Verification Pending: 1
+- Missing Essay: 1
+- Missing Recommendation: 1

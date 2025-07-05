@@ -33,6 +33,13 @@
   "email_domain_counts": {
     "example.com": 6
   },
+  "note_tag_counts": {
+    "missing_essay": 1,
+    "income_verification_pending": 1,
+    "documents_complete": 1,
+    "missing_recommendation": 1,
+    "gpa_review": 1
+  },
   "gpa_avg": 3.38,
   "gpa_min": 2.4,
   "gpa_max": 4.6,

@@ -33,3 +33,8 @@
 ## Iteration 5
 - Ran the Postgres seed export for the latest sample intake batch to refresh production data.
 - Verified the schema migration script applies cleanly with multi-statement execution.
+
+## Iteration 6
+- Added eligibility note tag extraction with summary/scorecard counts and per-application tags.
+- Extended Postgres schema + exports to persist note tags and batch tag counts.
+- Regenerated sample outputs and seeded the production intake_normalizer tables with the updated batch.

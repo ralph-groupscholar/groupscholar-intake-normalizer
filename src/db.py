@@ -73,7 +73,8 @@ def insert_batch(
                 submission_end,
                 program_counts,
                 program_gpa_avg,
-                income_bracket_counts
+                income_bracket_counts,
+                note_tag_counts
             ) VALUES (
                 %(batch_id)s,
                 %(batch_label)s,
@@ -101,7 +102,8 @@ def insert_batch(
                 %(submission_end)s,
                 %(program_counts)s,
                 %(program_gpa_avg)s,
-                %(income_bracket_counts)s
+                %(income_bracket_counts)s,
+                %(note_tag_counts)s
             )
             """,
             {
@@ -132,6 +134,7 @@ def insert_batch(
                 "program_counts": Json(summary.program_counts),
                 "program_gpa_avg": Json(summary.program_gpa_avg),
                 "income_bracket_counts": Json(summary.income_bracket_counts),
+                "note_tag_counts": Json(summary.note_tag_counts),
             },
         )
 
@@ -150,6 +153,7 @@ def insert_batch(
                     "submission_date": payload["submission_date"],
                     "first_gen": payload["first_gen"],
                     "eligibility_notes": payload["eligibility_notes"],
+                    "note_tags": payload["note_tags"],
                     "flags": payload["flags"],
                 }
             )
@@ -168,6 +172,7 @@ def insert_batch(
                     submission_date,
                     first_gen,
                     eligibility_notes,
+                    note_tags,
                     flags
                 ) VALUES (
                     %(batch_id)s,
@@ -180,6 +185,7 @@ def insert_batch(
                     %(submission_date)s,
                     %(first_gen)s,
                     %(eligibility_notes)s,
+                    %(note_tags)s,
                     %(flags)s
                 )
                 """,
