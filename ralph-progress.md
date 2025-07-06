@@ -38,3 +38,8 @@
 - Added eligibility note tag extraction with summary/scorecard counts and per-application tags.
 - Extended Postgres schema + exports to persist note tags and batch tag counts.
 - Regenerated sample outputs and seeded the production intake_normalizer tables with the updated batch.
+
+## Iteration 79
+- Added review priority counts to the summary report and scorecard outputs plus review status in issues export.
+- Updated Postgres schema and indexes to support review status/priority analytics and reseeded the production batch.
+- Regenerated sample outputs to reflect review readiness and priority metrics.

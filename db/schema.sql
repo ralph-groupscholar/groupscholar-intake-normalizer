@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   program_counts JSONB NOT NULL,
   program_gpa_avg JSONB NOT NULL,
   income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-  note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb
+  note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb
 );
 
 CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
@@ -45,11 +47,11 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
   first_gen BOOLEAN NOT NULL DEFAULT FALSE,
   eligibility_notes TEXT,
   note_tags TEXT[] NOT NULL DEFAULT '{}',
-  flags TEXT[] NOT NULL
+  flags TEXT[] NOT NULL,
+  review_status TEXT NOT NULL DEFAULT 'ready',
+  review_priority TEXT NOT NULL DEFAULT 'ready'
 );
 
-CREATE INDEX IF NOT EXISTS idx_intake_normalizer_program
-  ON intake_normalizer.applications(program);
 
 ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS missing_program INTEGER NOT NULL DEFAULT 0;
@@ -67,7 +69,14 @@ ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS gpa_max NUMERIC(4, 2),
   ADD COLUMN IF NOT EXISTS program_gpa_avg JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 ALTER TABLE intake_normalizer.applications
-  ADD COLUMN IF NOT EXISTS note_tags TEXT[] NOT NULL DEFAULT '{}';
+  ADD COLUMN IF NOT EXISTS note_tags TEXT[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'ready',
+  ADD COLUMN IF NOT EXISTS review_priority TEXT NOT NULL DEFAULT 'ready';
+
+CREATE INDEX IF NOT EXISTS idx_intake_normalizer_program
+  ON intake_normalizer.applications(program);

@@ -39,6 +39,21 @@ NOTE_TAG_RULES = {
     "documents_complete": ["all docs complete", "docs complete", "documents complete"],
     "gpa_review": ["gpa needs review", "gpa review"],
 }
+REVIEW_STATUS_ORDER = ["incomplete", "needs_review", "needs_follow_up", "ready"]
+REVIEW_PRIORITY_ORDER = ["high", "medium", "low", "ready"]
+CRITICAL_FLAGS = {
+    "missing_applicant_id",
+    "missing_name",
+    "missing_email",
+    "invalid_email",
+    "missing_program",
+    "invalid_submission_date",
+}
+HIGH_FLAGS = {
+    "gpa_out_of_range",
+    "invalid_gpa",
+    "future_submission_date",
+}
 HEADER_ALIASES = {
     "applicant id": "applicant_id",
     "application id": "applicant_id",
@@ -208,6 +223,7 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     if submission and submission > date.today().isoformat():
         flags.append("future_submission_date")
 
+    review_status, review_priority = derive_review_status(flags)
     return NormalizedApplication(
         applicant_id=row.get("applicant_id", "").strip(),
         name=row.get("name", "").strip(),
@@ -220,6 +236,8 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         eligibility_notes=eligibility_notes,
         note_tags=note_tags,
         flags=flags,
+        review_status=review_status,
+        review_priority=review_priority,
     )
 
 
@@ -249,6 +267,21 @@ def apply_duplicate_flags(apps: List[NormalizedApplication]) -> Tuple[int, int]:
     return duplicate_email, duplicate_applicant_id
 
 
+def derive_review_status(flags: List[str]) -> Tuple[str, str]:
+    if any(flag in CRITICAL_FLAGS for flag in flags):
+        return "incomplete", "high"
+    if any(flag in HIGH_FLAGS for flag in flags):
+        return "needs_review", "medium"
+    if flags:
+        return "needs_follow_up", "low"
+    return "ready", "ready"
+
+
+def update_review_status(apps: List[NormalizedApplication]) -> None:
+    for app in apps:
+        app.review_status, app.review_priority = derive_review_status(app.flags)
+
+
 def build_summary(
     apps: List[NormalizedApplication],
     duplicate_email: int,
@@ -258,6 +291,8 @@ def build_summary(
     program_gpas: Dict[str, List[float]] = {}
     income_bracket_counts: Dict[str, int] = {}
     note_tag_counts: Dict[str, int] = {}
+    review_status_counts: Dict[str, int] = {}
+    review_priority_counts: Dict[str, int] = {}
     missing_applicant_id = 0
     missing_name = 0
     missing_email = 0
@@ -284,6 +319,8 @@ def build_summary(
         if app.note_tags:
             for tag in app.note_tags:
                 note_tag_counts[tag] = note_tag_counts.get(tag, 0) + 1
+        review_status_counts[app.review_status] = review_status_counts.get(app.review_status, 0) + 1
+        review_priority_counts[app.review_priority] = review_priority_counts.get(app.review_priority, 0) + 1
         if "missing_applicant_id" in app.flags:
             missing_applicant_id += 1
         if "missing_name" in app.flags:
@@ -349,6 +386,8 @@ def build_summary(
         program_gpa_avg=program_gpa_avg,
         income_bracket_counts=income_bracket_counts,
         note_tag_counts=note_tag_counts,
+        review_status_counts=review_status_counts,
+        review_priority_counts=review_priority_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -387,8 +426,21 @@ def write_report(summary: Summary, path: Path) -> None:
         f"Flagged applications: {summary.flagged_applications} ({summary.flagged_rate}%)",
         f"Submission window: {summary.submission_start or 'n/a'} to {summary.submission_end or 'n/a'}",
         "",
-        "## Applications by program",
+        "## Review readiness",
     ]
+    for status in REVIEW_STATUS_ORDER:
+        count = summary.review_status_counts.get(status, 0)
+        lines.append(f"- {status.replace('_', ' ').title()}: {count}")
+    lines.extend(
+        [
+            "",
+            "## Review priority",
+        ]
+    )
+    for priority in REVIEW_PRIORITY_ORDER:
+        count = summary.review_priority_counts.get(priority, 0)
+        lines.append(f"- {priority.replace('_', ' ').title()}: {count}")
+    lines.extend(["", "## Applications by program"])
     for program, count in sorted(summary.program_counts.items()):
         lines.append(f"- {program}: {count}")
     lines.append("")
@@ -447,6 +499,7 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "program": app.program,
                 "submission_date": app.submission_date or "",
                 "flags": "; ".join(app.flags),
+                "review_status": app.review_status,
                 "follow_up_reason": follow_up_reason(app.flags),
             }
         )
@@ -460,6 +513,7 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "program",
                 "submission_date",
                 "flags",
+                "review_status",
                 "follow_up_reason",
             ],
         )
@@ -491,6 +545,8 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         income_bracket_counts=summary.income_bracket_counts,
         email_domain_counts=dict(sorted(email_domains.items(), key=lambda item: item[1], reverse=True)),
         note_tag_counts=summary.note_tag_counts,
+        review_status_counts=summary.review_status_counts,
+        review_priority_counts=summary.review_priority_counts,
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,
         gpa_max=summary.gpa_max,
@@ -509,6 +565,7 @@ def run(
     rows = read_applications(input_path)
     apps = [normalize_row(row) for row in rows]
     duplicate_email, duplicate_applicant_id = apply_duplicate_flags(apps)
+    update_review_status(apps)
     summary = build_summary(apps, duplicate_email, duplicate_applicant_id)
     ensure_parent(out_path)
     ensure_parent(report_path)
@@ -536,6 +593,7 @@ def run_with_db(
     rows = read_applications(input_path)
     apps = [normalize_row(row) for row in rows]
     duplicate_email, duplicate_applicant_id = apply_duplicate_flags(apps)
+    update_review_status(apps)
     summary = build_summary(apps, duplicate_email, duplicate_applicant_id)
     ensure_parent(out_path)
     ensure_parent(report_path)

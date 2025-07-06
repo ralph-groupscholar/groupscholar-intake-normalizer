@@ -20,6 +20,18 @@ Duplicate applicant IDs: 1
 Flagged applications: 5 (62.5%)
 Submission window: 2025-12-29 to 2026-02-02
 
+## Review readiness
+- Incomplete: 4
+- Needs Review: 0
+- Needs Follow Up: 1
+- Ready: 3
+
+## Review priority
+- High: 4
+- Medium: 0
+- Low: 1
+- Ready: 3
+
 ## Applications by program
 - Arts Catalyst: 2
 - Health Futures: 2

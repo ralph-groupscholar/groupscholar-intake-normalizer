@@ -10,7 +10,9 @@
     "first_gen": true,
     "eligibility_notes": "Strong community leadership",
     "note_tags": [],
-    "flags": []
+    "flags": [],
+    "review_status": "ready",
+    "review_priority": "ready"
   },
   {
     "applicant_id": "A-102",
@@ -28,7 +30,9 @@
     "flags": [
       "missing_email",
       "low_gpa"
-    ]
+    ],
+    "review_status": "incomplete",
+    "review_priority": "high"
   },
   {
     "applicant_id": "A-103",
@@ -47,7 +51,9 @@
       "missing_income",
       "duplicate_email",
       "duplicate_applicant_id"
-    ]
+    ],
+    "review_status": "needs_follow_up",
+    "review_priority": "low"
   },
   {
     "applicant_id": "A-104",
@@ -62,7 +68,9 @@
     "note_tags": [
       "documents_complete"
     ],
-    "flags": []
+    "flags": [],
+    "review_status": "ready",
+    "review_priority": "ready"
   },
   {
     "applicant_id": "A-105",
@@ -77,7 +85,9 @@
     "note_tags": [
       "missing_recommendation"
     ],
-    "flags": []
+    "flags": [],
+    "review_status": "ready",
+    "review_priority": "ready"
   },
   {
     "applicant_id": "A-103",
@@ -94,7 +104,9 @@
       "missing_name",
       "duplicate_email",
       "duplicate_applicant_id"
-    ]
+    ],
+    "review_status": "incomplete",
+    "review_priority": "high"
   },
   {
     "applicant_id": "A-106",
@@ -109,7 +121,9 @@
     "note_tags": [],
     "flags": [
       "invalid_email"
-    ]
+    ],
+    "review_status": "incomplete",
+    "review_priority": "high"
   },
   {
     "applicant_id": "A-107",
@@ -127,6 +141,8 @@
     "flags": [
       "missing_program",
       "gpa_out_of_range"
-    ]
+    ],
+    "review_status": "incomplete",
+    "review_priority": "high"
   }
 ]

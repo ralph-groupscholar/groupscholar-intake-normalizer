@@ -74,7 +74,9 @@ def insert_batch(
                 program_counts,
                 program_gpa_avg,
                 income_bracket_counts,
-                note_tag_counts
+                note_tag_counts,
+                review_status_counts,
+                review_priority_counts
             ) VALUES (
                 %(batch_id)s,
                 %(batch_label)s,
@@ -103,7 +105,9 @@ def insert_batch(
                 %(program_counts)s,
                 %(program_gpa_avg)s,
                 %(income_bracket_counts)s,
-                %(note_tag_counts)s
+                %(note_tag_counts)s,
+                %(review_status_counts)s,
+                %(review_priority_counts)s
             )
             """,
             {
@@ -135,6 +139,8 @@ def insert_batch(
                 "program_gpa_avg": Json(summary.program_gpa_avg),
                 "income_bracket_counts": Json(summary.income_bracket_counts),
                 "note_tag_counts": Json(summary.note_tag_counts),
+                "review_status_counts": Json(summary.review_status_counts),
+                "review_priority_counts": Json(summary.review_priority_counts),
             },
         )
 
@@ -155,6 +161,8 @@ def insert_batch(
                     "eligibility_notes": payload["eligibility_notes"],
                     "note_tags": payload["note_tags"],
                     "flags": payload["flags"],
+                    "review_status": payload["review_status"],
+                    "review_priority": payload["review_priority"],
                 }
             )
 
@@ -173,7 +181,9 @@ def insert_batch(
                     first_gen,
                     eligibility_notes,
                     note_tags,
-                    flags
+                    flags,
+                    review_status,
+                    review_priority
                 ) VALUES (
                     %(batch_id)s,
                     %(applicant_id)s,
@@ -186,7 +196,9 @@ def insert_batch(
                     %(first_gen)s,
                     %(eligibility_notes)s,
                     %(note_tags)s,
-                    %(flags)s
+                    %(flags)s,
+                    %(review_status)s,
+                    %(review_priority)s
                 )
                 """,
                 app_rows,

@@ -1,6 +1,6 @@
-applicant_id,name,email,program,submission_date,flags,follow_up_reason
-A-102,Maya Patel,,Arts Catalyst,2026-01-18,missing_email; low_gpa,Missing email; Low GPA
-A-103,Sam Rivera,sam.rivera@example.com,STEM Scholars,2026-01-12,missing_income; duplicate_email; duplicate_applicant_id,Missing income bracket; Duplicate email; Duplicate applicant ID
-A-103,,sam.rivera@example.com,STEM Scholars,2026-01-15,missing_name; duplicate_email; duplicate_applicant_id,Missing applicant name; Duplicate email; Duplicate applicant ID
-A-106,Lila Chen,lila.chen_at_example.com,Health Futures,2026-02-02,invalid_email,Invalid email
-A-107,Noah Ortiz,noah.ortiz@example.com,Unspecified,2026-01-25,missing_program; gpa_out_of_range,Missing program; GPA out of range
+applicant_id,name,email,program,submission_date,flags,review_status,follow_up_reason
+A-102,Maya Patel,,Arts Catalyst,2026-01-18,missing_email; low_gpa,incomplete,Missing email; Low GPA
+A-103,Sam Rivera,sam.rivera@example.com,STEM Scholars,2026-01-12,missing_income; duplicate_email; duplicate_applicant_id,needs_follow_up,Missing income bracket; Duplicate email; Duplicate applicant ID
+A-103,,sam.rivera@example.com,STEM Scholars,2026-01-15,missing_name; duplicate_email; duplicate_applicant_id,incomplete,Missing applicant name; Duplicate email; Duplicate applicant ID
+A-106,Lila Chen,lila.chen_at_example.com,Health Futures,2026-02-02,invalid_email,incomplete,Invalid email
+A-107,Noah Ortiz,noah.ortiz@example.com,Unspecified,2026-01-25,missing_program; gpa_out_of_range,incomplete,Missing program; GPA out of range
