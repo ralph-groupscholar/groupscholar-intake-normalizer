@@ -35,6 +35,10 @@
 - Verified the schema migration script applies cleanly with multi-statement execution.
 
 ## Iteration 6
+- Refreshed the production intake_normalizer batch with the latest review readiness outputs.
+- Regenerated sample reports, scorecards, and issue lists after the readiness refresh.
+
+## Iteration 6
 - Added eligibility note tag extraction with summary/scorecard counts and per-application tags.
 - Extended Postgres schema + exports to persist note tags and batch tag counts.
 - Regenerated sample outputs and seeded the production intake_normalizer tables with the updated batch.
