@@ -31,7 +31,11 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-  review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb
+  review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  data_quality_avg NUMERIC(5, 2),
+  data_quality_min INTEGER,
+  data_quality_max INTEGER,
+  quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb
 );
 
 CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
@@ -49,7 +53,8 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
   note_tags TEXT[] NOT NULL DEFAULT '{}',
   flags TEXT[] NOT NULL,
   review_status TEXT NOT NULL DEFAULT 'ready',
-  review_priority TEXT NOT NULL DEFAULT 'ready'
+  review_priority TEXT NOT NULL DEFAULT 'ready',
+  data_quality_score INTEGER NOT NULL DEFAULT 100
 );
 
 
@@ -71,12 +76,17 @@ ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS data_quality_avg NUMERIC(5, 2),
+  ADD COLUMN IF NOT EXISTS data_quality_min INTEGER,
+  ADD COLUMN IF NOT EXISTS data_quality_max INTEGER,
+  ADD COLUMN IF NOT EXISTS quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 ALTER TABLE intake_normalizer.applications
   ADD COLUMN IF NOT EXISTS note_tags TEXT[] NOT NULL DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'ready',
-  ADD COLUMN IF NOT EXISTS review_priority TEXT NOT NULL DEFAULT 'ready';
+  ADD COLUMN IF NOT EXISTS review_priority TEXT NOT NULL DEFAULT 'ready',
+  ADD COLUMN IF NOT EXISTS data_quality_score INTEGER NOT NULL DEFAULT 100;
 
 CREATE INDEX IF NOT EXISTS idx_intake_normalizer_program
   ON intake_normalizer.applications(program);

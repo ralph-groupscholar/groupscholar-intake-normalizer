@@ -18,7 +18,15 @@ Future submission date: 0
 Duplicate emails: 1
 Duplicate applicant IDs: 1
 Flagged applications: 5 (62.5%)
+Data quality average: 82.5
+Data quality range: 65 to 100
 Submission window: 2025-12-29 to 2026-02-02
+
+## Data quality tiers
+- Excellent: 3
+- Good: 2
+- Needs Attention: 3
+- Critical: 0
 
 ## Review readiness
 - Incomplete: 4

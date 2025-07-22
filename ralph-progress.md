@@ -47,3 +47,8 @@
 - Added review priority counts to the summary report and scorecard outputs plus review status in issues export.
 - Updated Postgres schema and indexes to support review status/priority analytics and reseeded the production batch.
 - Regenerated sample outputs to reflect review readiness and priority metrics.
+
+## Iteration 111
+- Added data quality scoring with tiering to the normalization pipeline and exposed scores in JSON, scorecards, and issue exports.
+- Extended summary reporting to include data quality averages/ranges plus tier counts for quick triage.
+- Updated Postgres schema + exports for data quality metrics and reseeded the production intake_normalizer batch.

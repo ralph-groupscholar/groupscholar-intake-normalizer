@@ -76,7 +76,11 @@ def insert_batch(
                 income_bracket_counts,
                 note_tag_counts,
                 review_status_counts,
-                review_priority_counts
+                review_priority_counts,
+                data_quality_avg,
+                data_quality_min,
+                data_quality_max,
+                quality_tier_counts
             ) VALUES (
                 %(batch_id)s,
                 %(batch_label)s,
@@ -107,7 +111,11 @@ def insert_batch(
                 %(income_bracket_counts)s,
                 %(note_tag_counts)s,
                 %(review_status_counts)s,
-                %(review_priority_counts)s
+                %(review_priority_counts)s,
+                %(data_quality_avg)s,
+                %(data_quality_min)s,
+                %(data_quality_max)s,
+                %(quality_tier_counts)s
             )
             """,
             {
@@ -141,6 +149,10 @@ def insert_batch(
                 "note_tag_counts": Json(summary.note_tag_counts),
                 "review_status_counts": Json(summary.review_status_counts),
                 "review_priority_counts": Json(summary.review_priority_counts),
+                "data_quality_avg": summary.data_quality_avg,
+                "data_quality_min": summary.data_quality_min,
+                "data_quality_max": summary.data_quality_max,
+                "quality_tier_counts": Json(summary.quality_tier_counts),
             },
         )
 
@@ -163,6 +175,7 @@ def insert_batch(
                     "flags": payload["flags"],
                     "review_status": payload["review_status"],
                     "review_priority": payload["review_priority"],
+                    "data_quality_score": payload["data_quality_score"],
                 }
             )
 
@@ -183,7 +196,8 @@ def insert_batch(
                     note_tags,
                     flags,
                     review_status,
-                    review_priority
+                    review_priority,
+                    data_quality_score
                 ) VALUES (
                     %(batch_id)s,
                     %(applicant_id)s,
@@ -198,7 +212,8 @@ def insert_batch(
                     %(note_tags)s,
                     %(flags)s,
                     %(review_status)s,
-                    %(review_priority)s
+                    %(review_priority)s,
+                    %(data_quality_score)s
                 )
                 """,
                 app_rows,

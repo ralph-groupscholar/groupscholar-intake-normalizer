@@ -12,7 +12,8 @@
     "note_tags": [],
     "flags": [],
     "review_status": "ready",
-    "review_priority": "ready"
+    "review_priority": "ready",
+    "data_quality_score": 100
   },
   {
     "applicant_id": "A-102",
@@ -32,7 +33,8 @@
       "low_gpa"
     ],
     "review_status": "incomplete",
-    "review_priority": "high"
+    "review_priority": "high",
+    "data_quality_score": 70
   },
   {
     "applicant_id": "A-103",
@@ -53,7 +55,8 @@
       "duplicate_applicant_id"
     ],
     "review_status": "needs_follow_up",
-    "review_priority": "low"
+    "review_priority": "low",
+    "data_quality_score": 85
   },
   {
     "applicant_id": "A-104",
@@ -70,7 +73,8 @@
     ],
     "flags": [],
     "review_status": "ready",
-    "review_priority": "ready"
+    "review_priority": "ready",
+    "data_quality_score": 100
   },
   {
     "applicant_id": "A-105",
@@ -87,7 +91,8 @@
     ],
     "flags": [],
     "review_status": "ready",
-    "review_priority": "ready"
+    "review_priority": "ready",
+    "data_quality_score": 100
   },
   {
     "applicant_id": "A-103",
@@ -106,7 +111,8 @@
       "duplicate_applicant_id"
     ],
     "review_status": "incomplete",
-    "review_priority": "high"
+    "review_priority": "high",
+    "data_quality_score": 65
   },
   {
     "applicant_id": "A-106",
@@ -123,7 +129,8 @@
       "invalid_email"
     ],
     "review_status": "incomplete",
-    "review_priority": "high"
+    "review_priority": "high",
+    "data_quality_score": 75
   },
   {
     "applicant_id": "A-107",
@@ -143,6 +150,7 @@
       "gpa_out_of_range"
     ],
     "review_status": "incomplete",
-    "review_priority": "high"
+    "review_priority": "high",
+    "data_quality_score": 65
   }
 ]

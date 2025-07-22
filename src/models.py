@@ -19,6 +19,9 @@ class NormalizedApplication:
     flags: List[str]
     review_status: str
     review_priority: str
+    data_quality_score: int
+    readiness_score: int
+    readiness_bucket: str
 
 
 @dataclass
@@ -49,6 +52,14 @@ class Summary:
     note_tag_counts: Dict[str, int]
     review_status_counts: Dict[str, int]
     review_priority_counts: Dict[str, int]
+    data_quality_avg: Optional[float]
+    data_quality_min: Optional[int]
+    data_quality_max: Optional[int]
+    quality_tier_counts: Dict[str, int]
+    readiness_avg: Optional[float]
+    readiness_min: Optional[int]
+    readiness_max: Optional[int]
+    readiness_bucket_counts: Dict[str, int]
     submission_start: Optional[str]
     submission_end: Optional[str]
 
@@ -66,6 +77,14 @@ class Scorecard:
     note_tag_counts: Dict[str, int]
     review_status_counts: Dict[str, int]
     review_priority_counts: Dict[str, int]
+    data_quality_avg: Optional[float]
+    data_quality_min: Optional[int]
+    data_quality_max: Optional[int]
+    quality_tier_counts: Dict[str, int]
+    readiness_avg: Optional[float]
+    readiness_min: Optional[int]
+    readiness_max: Optional[int]
+    readiness_bucket_counts: Dict[str, int]
     gpa_avg: Optional[float]
     gpa_min: Optional[float]
     gpa_max: Optional[float]

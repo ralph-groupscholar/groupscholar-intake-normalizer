@@ -41,6 +41,12 @@ NOTE_TAG_RULES = {
 }
 REVIEW_STATUS_ORDER = ["incomplete", "needs_review", "needs_follow_up", "ready"]
 REVIEW_PRIORITY_ORDER = ["high", "medium", "low", "ready"]
+QUALITY_TIERS = [
+    ("excellent", 90),
+    ("good", 75),
+    ("needs_attention", 50),
+    ("critical", 0),
+]
 CRITICAL_FLAGS = {
     "missing_applicant_id",
     "missing_name",
@@ -224,6 +230,7 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         flags.append("future_submission_date")
 
     review_status, review_priority = derive_review_status(flags)
+    data_quality_score = compute_quality_score(flags)
     return NormalizedApplication(
         applicant_id=row.get("applicant_id", "").strip(),
         name=row.get("name", "").strip(),
@@ -238,6 +245,7 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         flags=flags,
         review_status=review_status,
         review_priority=review_priority,
+        data_quality_score=data_quality_score,
     )
 
 
@@ -277,9 +285,29 @@ def derive_review_status(flags: List[str]) -> Tuple[str, str]:
     return "ready", "ready"
 
 
+def compute_quality_score(flags: List[str]) -> int:
+    score = 100
+    for flag in flags:
+        if flag in CRITICAL_FLAGS:
+            score -= 25
+        elif flag in HIGH_FLAGS:
+            score -= 10
+        else:
+            score -= 5
+    return max(0, score)
+
+
+def quality_tier(score: int) -> str:
+    for tier, cutoff in QUALITY_TIERS:
+        if score >= cutoff:
+            return tier
+    return "critical"
+
+
 def update_review_status(apps: List[NormalizedApplication]) -> None:
     for app in apps:
         app.review_status, app.review_priority = derive_review_status(app.flags)
+        app.data_quality_score = compute_quality_score(app.flags)
 
 
 def build_summary(
@@ -308,6 +336,8 @@ def build_summary(
     submission_dates: List[str] = []
     flagged_applications = 0
     gpas: List[float] = []
+    quality_scores: List[int] = []
+    quality_tier_counts: Dict[str, int] = {}
 
     for app in apps:
         program_counts[app.program] = program_counts.get(app.program, 0) + 1
@@ -349,6 +379,9 @@ def build_summary(
             submission_dates.append(app.submission_date)
         if app.flags:
             flagged_applications += 1
+        quality_scores.append(app.data_quality_score)
+        tier = quality_tier(app.data_quality_score)
+        quality_tier_counts[tier] = quality_tier_counts.get(tier, 0) + 1
 
     submission_dates.sort()
     submission_start = submission_dates[0] if submission_dates else None
@@ -360,6 +393,9 @@ def build_summary(
     program_gpa_avg: Dict[str, Optional[float]] = {}
     for program, values in program_gpas.items():
         program_gpa_avg[program] = round(sum(values) / len(values), 2) if values else None
+    data_quality_avg = round(sum(quality_scores) / len(quality_scores), 1) if quality_scores else None
+    data_quality_min = min(quality_scores) if quality_scores else None
+    data_quality_max = max(quality_scores) if quality_scores else None
 
     return Summary(
         total_rows=len(apps),
@@ -388,6 +424,10 @@ def build_summary(
         note_tag_counts=note_tag_counts,
         review_status_counts=review_status_counts,
         review_priority_counts=review_priority_counts,
+        data_quality_avg=data_quality_avg,
+        data_quality_min=data_quality_min,
+        data_quality_max=data_quality_max,
+        quality_tier_counts=quality_tier_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -424,10 +464,21 @@ def write_report(summary: Summary, path: Path) -> None:
         f"Duplicate emails: {summary.duplicate_email}",
         f"Duplicate applicant IDs: {summary.duplicate_applicant_id}",
         f"Flagged applications: {summary.flagged_applications} ({summary.flagged_rate}%)",
+        f"Data quality average: {summary.data_quality_avg if summary.data_quality_avg is not None else 'n/a'}",
+        f"Data quality range: {summary.data_quality_min if summary.data_quality_min is not None else 'n/a'} to {summary.data_quality_max if summary.data_quality_max is not None else 'n/a'}",
         f"Submission window: {summary.submission_start or 'n/a'} to {summary.submission_end or 'n/a'}",
         "",
-        "## Review readiness",
+        "## Data quality tiers",
     ]
+    for tier, _ in QUALITY_TIERS:
+        count = summary.quality_tier_counts.get(tier, 0)
+        lines.append(f"- {tier.replace('_', ' ').title()}: {count}")
+    lines.extend(
+        [
+            "",
+            "## Review readiness",
+        ]
+    )
     for status in REVIEW_STATUS_ORDER:
         count = summary.review_status_counts.get(status, 0)
         lines.append(f"- {status.replace('_', ' ').title()}: {count}")
@@ -500,6 +551,8 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "submission_date": app.submission_date or "",
                 "flags": "; ".join(app.flags),
                 "review_status": app.review_status,
+                "data_quality_score": app.data_quality_score,
+                "quality_tier": quality_tier(app.data_quality_score),
                 "follow_up_reason": follow_up_reason(app.flags),
             }
         )
@@ -514,6 +567,8 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "submission_date",
                 "flags",
                 "review_status",
+                "data_quality_score",
+                "quality_tier",
                 "follow_up_reason",
             ],
         )
@@ -547,6 +602,10 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         note_tag_counts=summary.note_tag_counts,
         review_status_counts=summary.review_status_counts,
         review_priority_counts=summary.review_priority_counts,
+        data_quality_avg=summary.data_quality_avg,
+        data_quality_min=summary.data_quality_min,
+        data_quality_max=summary.data_quality_max,
+        quality_tier_counts=summary.quality_tier_counts,
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,
         gpa_max=summary.gpa_max,

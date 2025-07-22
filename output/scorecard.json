@@ -50,6 +50,14 @@
     "high": 4,
     "low": 1
   },
+  "data_quality_avg": 82.5,
+  "data_quality_min": 65,
+  "data_quality_max": 100,
+  "quality_tier_counts": {
+    "excellent": 3,
+    "needs_attention": 3,
+    "good": 2
+  },
   "gpa_avg": 3.38,
   "gpa_min": 2.4,
   "gpa_max": 4.6,
