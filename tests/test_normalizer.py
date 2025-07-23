@@ -68,6 +68,11 @@ class NormalizerSummaryTest(unittest.TestCase):
         self.assertEqual(summary.submission_recency_counts.get(expected_recency), 2)
         self.assertEqual(summary.referral_source_counts.get("School Counselor"), 1)
         self.assertEqual(summary.referral_source_counts.get("Social Media"), 1)
+        self.assertEqual(summary.first_gen_rate, 50.0)
+        self.assertEqual(summary.first_gen_program_counts.get("STEM Scholars"), 1)
+        self.assertEqual(summary.first_gen_program_counts.get("Arts Catalyst"), 0)
+        self.assertEqual(summary.first_gen_program_rates.get("STEM Scholars"), 100.0)
+        self.assertEqual(summary.first_gen_program_rates.get("Arts Catalyst"), 0.0)
 
         scorecard = build_scorecard(apps, summary)
         self.assertEqual(scorecard.email_domain_counts.get("example.com"), 1)
@@ -77,6 +82,11 @@ class NormalizerSummaryTest(unittest.TestCase):
         self.assertEqual(scorecard.submission_recency_counts.get(expected_recency), 2)
         self.assertEqual(scorecard.referral_source_counts.get("School Counselor"), 1)
         self.assertEqual(scorecard.referral_source_counts.get("Social Media"), 1)
+        self.assertEqual(scorecard.first_gen_rate, 50.0)
+        self.assertEqual(scorecard.first_gen_program_counts.get("STEM Scholars"), 1)
+        self.assertEqual(scorecard.first_gen_program_counts.get("Arts Catalyst"), 0)
+        self.assertEqual(scorecard.first_gen_program_rates.get("STEM Scholars"), 100.0)
+        self.assertEqual(scorecard.first_gen_program_rates.get("Arts Catalyst"), 0.0)
 
     def test_missing_submission_date_is_flagged(self):
         row = {

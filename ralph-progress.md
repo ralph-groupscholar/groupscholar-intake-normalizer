@@ -67,3 +67,8 @@
 - Captured email domain categories on each normalized application and summarized them in reports/scorecards.
 - Persisted referral sources and email domain categories in the Postgres schema and batch exports.
 - Regenerated sample outputs and expanded unit tests for email domain category counts.
+
+## Iteration 67
+- Added first-gen participation rates overall and by program to summaries and scorecards.
+- Extended batch schema/export to persist first-gen rates and program-level first-gen mix.
+- Regenerated sample outputs and expanded tests to cover first-gen rate metrics.

@@ -44,6 +44,7 @@ class Summary:
     invalid_gpa: int
     gpa_out_of_range: int
     first_gen: int
+    first_gen_rate: float
     invalid_submission_date: int
     future_submission_date: int
     missing_submission_date: int
@@ -57,6 +58,8 @@ class Summary:
     gpa_max: Optional[float]
     program_counts: Dict[str, int]
     program_gpa_avg: Dict[str, Optional[float]]
+    first_gen_program_counts: Dict[str, int]
+    first_gen_program_rates: Dict[str, float]
     referral_source_counts: Dict[str, int]
     income_bracket_counts: Dict[str, int]
     note_tag_counts: Dict[str, int]
@@ -91,6 +94,8 @@ class Scorecard:
     flag_rates: Dict[str, float]
     program_counts: Dict[str, int]
     program_gpa_avg: Dict[str, Optional[float]]
+    first_gen_program_counts: Dict[str, int]
+    first_gen_program_rates: Dict[str, float]
     referral_source_counts: Dict[str, int]
     income_bracket_counts: Dict[str, int]
     email_domain_counts: Dict[str, int]
@@ -111,6 +116,7 @@ class Scorecard:
     gpa_avg: Optional[float]
     gpa_min: Optional[float]
     gpa_max: Optional[float]
+    first_gen_rate: float
     submission_age_avg: Optional[float]
     submission_age_min: Optional[int]
     submission_age_max: Optional[int]

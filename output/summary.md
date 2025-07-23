@@ -13,7 +13,7 @@ Invalid GPA: 0
 GPA out of range: 1
 GPA average: 3.38
 GPA range: 2.4 to 4.6
-First-gen applicants: 4
+First-gen applicants: 4 (50.0%)
 Invalid submission date: 0
 Future submission date: 0
 Missing submission date: 0
@@ -70,6 +70,12 @@ Submission window: 2025-12-29 to 2026-02-02
 - Health Futures: 3.65
 - STEM Scholars: 3.27
 - Unspecified: 4.6
+
+## First-gen mix by program
+- Arts Catalyst: 1/2 (50.0%)
+- Health Futures: 0/2 (0.0%)
+- STEM Scholars: 3/3 (100.0%)
+- Unspecified: 0/1 (0.0%)
 
 ## Applications by income bracket
 - 40k-70k: 2

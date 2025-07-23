@@ -27,6 +27,18 @@
     "Health Futures": 3.65,
     "Unspecified": 4.6
   },
+  "first_gen_program_counts": {
+    "STEM Scholars": 3,
+    "Arts Catalyst": 1,
+    "Health Futures": 0,
+    "Unspecified": 0
+  },
+  "first_gen_program_rates": {
+    "STEM Scholars": 100.0,
+    "Arts Catalyst": 50.0,
+    "Health Futures": 0.0,
+    "Unspecified": 0.0
+  },
   "referral_source_counts": {},
   "income_bracket_counts": {
     "<=40k": 4,
@@ -85,6 +97,7 @@
   "gpa_avg": 3.38,
   "gpa_min": 2.4,
   "gpa_max": 4.6,
+  "first_gen_rate": 50.0,
   "submission_age_avg": 23.2,
   "submission_age_min": 6,
   "submission_age_max": 41,

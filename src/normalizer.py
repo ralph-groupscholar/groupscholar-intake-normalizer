@@ -528,6 +528,7 @@ def build_summary(
 ) -> Summary:
     program_counts: Dict[str, int] = {}
     program_gpas: Dict[str, List[float]] = {}
+    first_gen_program_counts: Dict[str, int] = {}
     referral_source_counts: Dict[str, int] = {}
     income_bracket_counts: Dict[str, int] = {}
     note_tag_counts: Dict[str, int] = {}
@@ -565,6 +566,8 @@ def build_summary(
 
     for app in apps:
         program_counts[app.program] = program_counts.get(app.program, 0) + 1
+        if app.first_gen:
+            first_gen_program_counts[app.program] = first_gen_program_counts.get(app.program, 0) + 1
         if app.referral_source:
             referral_source_counts[app.referral_source] = (
                 referral_source_counts.get(app.referral_source, 0) + 1
@@ -642,12 +645,19 @@ def build_summary(
     submission_start = submission_dates[0] if submission_dates else None
     submission_end = submission_dates[-1] if submission_dates else None
     flagged_rate = round((flagged_applications / len(apps) * 100), 1) if apps else 0.0
+    first_gen_rate = round((first_gen / len(apps) * 100), 1) if apps else 0.0
     gpa_avg = round(sum(gpas) / len(gpas), 2) if gpas else None
     gpa_min = min(gpas) if gpas else None
     gpa_max = max(gpas) if gpas else None
     program_gpa_avg: Dict[str, Optional[float]] = {}
     for program, values in program_gpas.items():
         program_gpa_avg[program] = round(sum(values) / len(values), 2) if values else None
+    for program in program_counts:
+        first_gen_program_counts.setdefault(program, 0)
+    first_gen_program_rates: Dict[str, float] = {}
+    for program, total in program_counts.items():
+        first_gen_count = first_gen_program_counts.get(program, 0)
+        first_gen_program_rates[program] = round((first_gen_count / total * 100), 1) if total else 0.0
     data_quality_avg = round(sum(quality_scores) / len(quality_scores), 1) if quality_scores else None
     data_quality_min = min(quality_scores) if quality_scores else None
     data_quality_max = max(quality_scores) if quality_scores else None
@@ -673,6 +683,7 @@ def build_summary(
         invalid_gpa=invalid_gpa,
         gpa_out_of_range=gpa_out_of_range,
         first_gen=first_gen,
+        first_gen_rate=first_gen_rate,
         invalid_submission_date=invalid_submission_date,
         future_submission_date=future_submission_date,
         missing_submission_date=missing_submission_date,
@@ -686,6 +697,8 @@ def build_summary(
         gpa_max=gpa_max,
         program_counts=program_counts,
         program_gpa_avg=program_gpa_avg,
+        first_gen_program_counts=first_gen_program_counts,
+        first_gen_program_rates=first_gen_program_rates,
         referral_source_counts=referral_source_counts,
         income_bracket_counts=income_bracket_counts,
         note_tag_counts=note_tag_counts,
@@ -723,6 +736,9 @@ def write_scorecard(scorecard: Scorecard, path: Path) -> None:
 
 
 def write_report(summary: Summary, path: Path) -> None:
+    def format_pct(value: float) -> str:
+        return f"{value:.1f}%"
+
     lines = [
         "# Intake Normalization Summary",
         "",
@@ -739,7 +755,7 @@ def write_report(summary: Summary, path: Path) -> None:
         f"GPA out of range: {summary.gpa_out_of_range}",
         f"GPA average: {summary.gpa_avg if summary.gpa_avg is not None else 'n/a'}",
         f"GPA range: {summary.gpa_min if summary.gpa_min is not None else 'n/a'} to {summary.gpa_max if summary.gpa_max is not None else 'n/a'}",
-        f"First-gen applicants: {summary.first_gen}",
+        f"First-gen applicants: {summary.first_gen} ({format_pct(summary.first_gen_rate)})",
         f"Invalid submission date: {summary.invalid_submission_date}",
         f"Future submission date: {summary.future_submission_date}",
         f"Missing submission date: {summary.missing_submission_date}",
@@ -798,6 +814,16 @@ def write_report(summary: Summary, path: Path) -> None:
     lines.append("## GPA by program")
     for program, avg in sorted(summary.program_gpa_avg.items()):
         lines.append(f"- {program}: {avg if avg is not None else 'n/a'}")
+    lines.append("")
+    lines.append("## First-gen mix by program")
+    if summary.program_counts:
+        for program in sorted(summary.program_counts.keys()):
+            first_gen_count = summary.first_gen_program_counts.get(program, 0)
+            total = summary.program_counts.get(program, 0)
+            rate = summary.first_gen_program_rates.get(program, 0.0)
+            lines.append(f"- {program}: {first_gen_count}/{total} ({format_pct(rate)})")
+    else:
+        lines.append("- n/a")
     lines.append("")
     lines.append("## Applications by income bracket")
     for bracket, count in sorted(summary.income_bracket_counts.items()):
@@ -969,6 +995,8 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         flag_rates=flag_rates,
         program_counts=summary.program_counts,
         program_gpa_avg=summary.program_gpa_avg,
+        first_gen_program_counts=summary.first_gen_program_counts,
+        first_gen_program_rates=summary.first_gen_program_rates,
         referral_source_counts=summary.referral_source_counts,
         income_bracket_counts=summary.income_bracket_counts,
         email_domain_counts=dict(
@@ -991,6 +1019,7 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,
         gpa_max=summary.gpa_max,
+        first_gen_rate=summary.first_gen_rate,
         submission_age_avg=summary.submission_age_avg,
         submission_age_min=summary.submission_age_min,
         submission_age_max=summary.submission_age_max,
