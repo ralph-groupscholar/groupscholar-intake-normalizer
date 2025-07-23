@@ -3,26 +3,41 @@
     "applicant_id": "A-101",
     "name": "Jordan Lee",
     "email": "jordan.lee@example.com",
+    "email_domain_category": "commercial",
     "program": "STEM Scholars",
+    "referral_source": null,
     "gpa": 3.6,
     "income_bracket": "<=40k",
     "submission_date": "2026-01-20",
+    "submission_age_days": 19,
+    "submission_age_bucket": "15-30 days",
+    "submission_recency": "active",
     "first_gen": true,
     "eligibility_notes": "Strong community leadership",
     "note_tags": [],
-    "flags": [],
-    "review_status": "ready",
-    "review_priority": "ready",
-    "data_quality_score": 100
+    "flags": [
+      "missing_referral_source"
+    ],
+    "flag_severity": "medium",
+    "review_status": "needs_follow_up",
+    "review_priority": "low",
+    "data_quality_score": 95,
+    "readiness_score": 92,
+    "readiness_bucket": "ready"
   },
   {
     "applicant_id": "A-102",
     "name": "Maya Patel",
     "email": null,
+    "email_domain_category": "missing",
     "program": "Arts Catalyst",
+    "referral_source": null,
     "gpa": 2.4,
     "income_bracket": "40k-70k",
     "submission_date": "2026-01-18",
+    "submission_age_days": 21,
+    "submission_age_bucket": "15-30 days",
+    "submission_recency": "active",
     "first_gen": false,
     "eligibility_notes": "Missing essay draft",
     "note_tags": [
@@ -30,116 +45,174 @@
     ],
     "flags": [
       "missing_email",
+      "missing_referral_source",
       "low_gpa"
     ],
+    "flag_severity": "critical",
     "review_status": "incomplete",
     "review_priority": "high",
-    "data_quality_score": 70
+    "data_quality_score": 65,
+    "readiness_score": 54,
+    "readiness_bucket": "needs_review"
   },
   {
     "applicant_id": "A-103",
     "name": "Sam Rivera",
     "email": "sam.rivera@example.com",
+    "email_domain_category": "commercial",
     "program": "STEM Scholars",
+    "referral_source": null,
     "gpa": 3.1,
     "income_bracket": null,
     "submission_date": "2026-01-12",
+    "submission_age_days": 27,
+    "submission_age_bucket": "15-30 days",
+    "submission_recency": "active",
     "first_gen": true,
     "eligibility_notes": "Income verification pending",
     "note_tags": [
       "income_verification_pending"
     ],
     "flags": [
+      "missing_referral_source",
       "missing_income",
       "duplicate_email",
       "duplicate_applicant_id"
     ],
+    "flag_severity": "medium",
     "review_status": "needs_follow_up",
     "review_priority": "low",
-    "data_quality_score": 85
+    "data_quality_score": 80,
+    "readiness_score": 68,
+    "readiness_bucket": "needs_follow_up"
   },
   {
     "applicant_id": "A-104",
     "name": "Anika Bose",
     "email": "anika.bose@example.com",
+    "email_domain_category": "commercial",
     "program": "Health Futures",
+    "referral_source": null,
     "gpa": 3.9,
     "income_bracket": "70k-100k",
     "submission_date": "2026-01-05",
+    "submission_age_days": 34,
+    "submission_age_bucket": "31-60 days",
+    "submission_recency": "stale",
     "first_gen": false,
     "eligibility_notes": "All docs complete",
     "note_tags": [
       "documents_complete"
     ],
-    "flags": [],
-    "review_status": "ready",
-    "review_priority": "ready",
-    "data_quality_score": 100
+    "flags": [
+      "missing_referral_source",
+      "stale_submission"
+    ],
+    "flag_severity": "medium",
+    "review_status": "needs_follow_up",
+    "review_priority": "low",
+    "data_quality_score": 90,
+    "readiness_score": 84,
+    "readiness_bucket": "needs_follow_up"
   },
   {
     "applicant_id": "A-105",
     "name": "Chris Nguyen",
     "email": "chris.nguyen@example.com",
+    "email_domain_category": "commercial",
     "program": "Arts Catalyst",
+    "referral_source": null,
     "gpa": 2.9,
     "income_bracket": "<=40k",
     "submission_date": "2025-12-29",
+    "submission_age_days": 41,
+    "submission_age_bucket": "31-60 days",
+    "submission_recency": "stale",
     "first_gen": true,
     "eligibility_notes": "Needs recommendation letter",
     "note_tags": [
       "missing_recommendation"
     ],
-    "flags": [],
-    "review_status": "ready",
-    "review_priority": "ready",
-    "data_quality_score": 100
+    "flags": [
+      "missing_referral_source",
+      "stale_submission"
+    ],
+    "flag_severity": "medium",
+    "review_status": "needs_follow_up",
+    "review_priority": "low",
+    "data_quality_score": 90,
+    "readiness_score": 84,
+    "readiness_bucket": "needs_follow_up"
   },
   {
     "applicant_id": "A-103",
     "name": "",
     "email": "sam.rivera@example.com",
+    "email_domain_category": "commercial",
     "program": "STEM Scholars",
+    "referral_source": null,
     "gpa": 3.1,
     "income_bracket": "<=40k",
     "submission_date": "2026-01-15",
+    "submission_age_days": 24,
+    "submission_age_bucket": "15-30 days",
+    "submission_recency": "active",
     "first_gen": true,
     "eligibility_notes": "Duplicate resubmission without name",
     "note_tags": [],
     "flags": [
       "missing_name",
+      "missing_referral_source",
       "duplicate_email",
       "duplicate_applicant_id"
     ],
+    "flag_severity": "critical",
     "review_status": "incomplete",
     "review_priority": "high",
-    "data_quality_score": 65
+    "data_quality_score": 60,
+    "readiness_score": 46,
+    "readiness_bucket": "needs_review"
   },
   {
     "applicant_id": "A-106",
     "name": "Lila Chen",
     "email": "lila.chen_at_example.com",
+    "email_domain_category": "invalid",
     "program": "Health Futures",
+    "referral_source": null,
     "gpa": 3.4,
     "income_bracket": "40k-70k",
     "submission_date": "2026-02-02",
+    "submission_age_days": 6,
+    "submission_age_bucket": "0-7 days",
+    "submission_recency": "fresh",
     "first_gen": false,
     "eligibility_notes": "Email format off",
     "note_tags": [],
     "flags": [
-      "invalid_email"
+      "invalid_email",
+      "missing_referral_source"
     ],
+    "flag_severity": "critical",
     "review_status": "incomplete",
     "review_priority": "high",
-    "data_quality_score": 75
+    "data_quality_score": 70,
+    "readiness_score": 62,
+    "readiness_bucket": "needs_review"
   },
   {
     "applicant_id": "A-107",
     "name": "Noah Ortiz",
     "email": "noah.ortiz@example.com",
+    "email_domain_category": "commercial",
     "program": "Unspecified",
+    "referral_source": null,
     "gpa": 4.6,
     "income_bracket": "<=40k",
     "submission_date": "2026-01-25",
+    "submission_age_days": 14,
+    "submission_age_bucket": "8-14 days",
+    "submission_recency": "active",
     "first_gen": false,
     "eligibility_notes": "GPA needs review",
     "note_tags": [
@@ -147,10 +220,14 @@
     ],
     "flags": [
       "missing_program",
+      "missing_referral_source",
       "gpa_out_of_range"
     ],
+    "flag_severity": "critical",
     "review_status": "incomplete",
     "review_priority": "high",
-    "data_quality_score": 65
+    "data_quality_score": 60,
+    "readiness_score": 47,
+    "readiness_bucket": "needs_review"
   }
 ]

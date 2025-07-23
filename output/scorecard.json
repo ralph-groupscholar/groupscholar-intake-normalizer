@@ -1,13 +1,15 @@
 {
   "total_rows": 8,
-  "flagged_applications": 5,
-  "flagged_rate": 62.5,
+  "flagged_applications": 8,
+  "flagged_rate": 100.0,
   "flag_rates": {
+    "missing_referral_source": 1.0,
     "missing_email": 0.125,
     "low_gpa": 0.125,
     "missing_income": 0.125,
     "duplicate_email": 0.25,
     "duplicate_applicant_id": 0.25,
+    "stale_submission": 0.25,
     "missing_name": 0.125,
     "invalid_email": 0.125,
     "missing_program": 0.125,
@@ -25,6 +27,7 @@
     "Health Futures": 3.65,
     "Unspecified": 4.6
   },
+  "referral_source_counts": {},
   "income_bracket_counts": {
     "<=40k": 4,
     "40k-70k": 2,
@@ -40,27 +43,62 @@
     "missing_recommendation": 1,
     "gpa_review": 1
   },
+  "submission_weekday_counts": {
+    "Tuesday": 1,
+    "Sunday": 2,
+    "Monday": 4,
+    "Thursday": 1
+  },
   "review_status_counts": {
-    "ready": 3,
-    "incomplete": 4,
-    "needs_follow_up": 1
+    "needs_follow_up": 4,
+    "incomplete": 4
   },
   "review_priority_counts": {
-    "ready": 3,
-    "high": 4,
-    "low": 1
+    "low": 4,
+    "high": 4
   },
-  "data_quality_avg": 82.5,
-  "data_quality_min": 65,
-  "data_quality_max": 100,
+  "flag_severity_counts": {
+    "medium": 4,
+    "critical": 4
+  },
+  "email_domain_category_counts": {
+    "commercial": 6,
+    "missing": 1,
+    "invalid": 1
+  },
+  "data_quality_avg": 76.2,
+  "data_quality_min": 60,
+  "data_quality_max": 95,
   "quality_tier_counts": {
     "excellent": 3,
-    "needs_attention": 3,
-    "good": 2
+    "needs_attention": 4,
+    "good": 1
+  },
+  "readiness_avg": 67.1,
+  "readiness_min": 46,
+  "readiness_max": 92,
+  "readiness_bucket_counts": {
+    "ready": 1,
+    "needs_review": 4,
+    "needs_follow_up": 3
   },
   "gpa_avg": 3.38,
   "gpa_min": 2.4,
   "gpa_max": 4.6,
+  "submission_age_avg": 23.2,
+  "submission_age_min": 6,
+  "submission_age_max": 41,
+  "submission_age_bucket_counts": {
+    "15-30 days": 4,
+    "31-60 days": 2,
+    "0-7 days": 1,
+    "8-14 days": 1
+  },
+  "submission_recency_counts": {
+    "active": 5,
+    "stale": 2,
+    "fresh": 1
+  },
   "submission_start": "2025-12-29",
   "submission_end": "2026-02-02"
 }

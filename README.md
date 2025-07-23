@@ -7,7 +7,7 @@ Normalize scholarship intake CSV files into a consistent JSON payload with light
 - Parses an intake CSV and standardizes fields (dates, program names, booleans).
 - Normalizes column headers (common aliases) to reduce prep work.
 - Generates a normalized JSON dataset for downstream dashboards.
-- Produces a summary report with risk flags, review readiness tiers, data quality tiers, GPA stats, income bracket mix, submission window, duplicate counts, and eligibility note tags.
+- Produces a summary report with risk flags, review readiness tiers, readiness scores, data quality tiers, GPA stats, income bracket mix, submission window, duplicate counts, eligibility note tags, email domain mix, email domain categories, submission weekday counts, submission age buckets, and submission recency.
 - Optional scorecard JSON for downstream QA automation.
 - Flags missing programs and out-of-range GPAs for follow-up and assigns review readiness tiers.
 
@@ -44,8 +44,8 @@ python3 src/normalizer.py \
 
 ## Output
 
-- `output/normalized.json` with normalized rows + computed flags, review readiness tiers, and data quality scores.
-- `output/summary.md` with a one-page intake snapshot, data quality tiers, and eligibility note tag counts.
+- `output/normalized.json` with normalized rows + computed flags, review readiness tiers, readiness scores, and data quality scores.
+- `output/summary.md` with a one-page intake snapshot, data quality tiers, eligibility note tag counts, email domain mix, submission weekday counts, submission age buckets, and submission recency.
 - `output/issues.csv` with only the applications that need follow-up, including review status.
 - `output/scorecard.json` with rates + aggregates for QA dashboards and note tag counts.
 

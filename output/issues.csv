@@ -1,6 +1,9 @@
-applicant_id,name,email,program,submission_date,flags,review_status,data_quality_score,quality_tier,follow_up_reason
-A-102,Maya Patel,,Arts Catalyst,2026-01-18,missing_email; low_gpa,incomplete,70,needs_attention,Missing email; Low GPA
-A-103,Sam Rivera,sam.rivera@example.com,STEM Scholars,2026-01-12,missing_income; duplicate_email; duplicate_applicant_id,needs_follow_up,85,good,Missing income bracket; Duplicate email; Duplicate applicant ID
-A-103,,sam.rivera@example.com,STEM Scholars,2026-01-15,missing_name; duplicate_email; duplicate_applicant_id,incomplete,65,needs_attention,Missing applicant name; Duplicate email; Duplicate applicant ID
-A-106,Lila Chen,lila.chen_at_example.com,Health Futures,2026-02-02,invalid_email,incomplete,75,good,Invalid email
-A-107,Noah Ortiz,noah.ortiz@example.com,Unspecified,2026-01-25,missing_program; gpa_out_of_range,incomplete,65,needs_attention,Missing program; GPA out of range
+applicant_id,name,email,program,referral_source,submission_date,submission_age_days,submission_age_bucket,submission_recency,flags,flag_severity,review_status,data_quality_score,quality_tier,readiness_score,readiness_bucket,follow_up_reason
+A-101,Jordan Lee,jordan.lee@example.com,STEM Scholars,,2026-01-20,19,15-30 days,active,missing_referral_source,medium,needs_follow_up,95,excellent,92,ready,Missing referral source
+A-102,Maya Patel,,Arts Catalyst,,2026-01-18,21,15-30 days,active,missing_email; missing_referral_source; low_gpa,critical,incomplete,65,needs_attention,54,needs_review,Missing email; Missing referral source; Low GPA
+A-103,Sam Rivera,sam.rivera@example.com,STEM Scholars,,2026-01-12,27,15-30 days,active,missing_referral_source; missing_income; duplicate_email; duplicate_applicant_id,medium,needs_follow_up,80,good,68,needs_follow_up,Missing referral source; Missing income bracket; Duplicate email; Duplicate applicant ID
+A-104,Anika Bose,anika.bose@example.com,Health Futures,,2026-01-05,34,31-60 days,stale,missing_referral_source; stale_submission,medium,needs_follow_up,90,excellent,84,needs_follow_up,Missing referral source; Submission older than 30 days
+A-105,Chris Nguyen,chris.nguyen@example.com,Arts Catalyst,,2025-12-29,41,31-60 days,stale,missing_referral_source; stale_submission,medium,needs_follow_up,90,excellent,84,needs_follow_up,Missing referral source; Submission older than 30 days
+A-103,,sam.rivera@example.com,STEM Scholars,,2026-01-15,24,15-30 days,active,missing_name; missing_referral_source; duplicate_email; duplicate_applicant_id,critical,incomplete,60,needs_attention,46,needs_review,Missing applicant name; Missing referral source; Duplicate email; Duplicate applicant ID
+A-106,Lila Chen,lila.chen_at_example.com,Health Futures,,2026-02-02,6,0-7 days,fresh,invalid_email; missing_referral_source,critical,incomplete,70,needs_attention,62,needs_review,Invalid email; Missing referral source
+A-107,Noah Ortiz,noah.ortiz@example.com,Unspecified,,2026-01-25,14,8-14 days,active,missing_program; missing_referral_source; gpa_out_of_range,critical,incomplete,60,needs_attention,47,needs_review,Missing program; Missing referral source; GPA out of range

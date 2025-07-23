@@ -16,6 +16,38 @@ PROGRAM_ALIASES = {
     "arts catalyst": "Arts Catalyst",
     "health futures": "Health Futures",
 }
+REFERRAL_SOURCE_ALIASES = {
+    "school counselor": "School Counselor",
+    "counselor": "School Counselor",
+    "guidance counselor": "School Counselor",
+    "teacher": "Teacher",
+    "alumni": "Alumni",
+    "alum": "Alumni",
+    "peer": "Peer Referral",
+    "friend": "Peer Referral",
+    "peer referral": "Peer Referral",
+    "parent": "Parent/Guardian",
+    "guardian": "Parent/Guardian",
+    "parent/guardian": "Parent/Guardian",
+    "website": "Website",
+    "web": "Website",
+    "search": "Web Search",
+    "web search": "Web Search",
+    "instagram": "Social Media",
+    "tiktok": "Social Media",
+    "linkedin": "Social Media",
+    "social": "Social Media",
+    "social media": "Social Media",
+    "email": "Email Campaign",
+    "email campaign": "Email Campaign",
+    "newsletter": "Email Campaign",
+    "partner org": "Partner Organization",
+    "partner organization": "Partner Organization",
+    "community org": "Partner Organization",
+    "community organization": "Partner Organization",
+    "event": "Event",
+    "info session": "Event",
+}
 INCOME_ALIASES = {
     "<=40k": "<=40k",
     "<40k": "<=40k",
@@ -41,12 +73,36 @@ NOTE_TAG_RULES = {
 }
 REVIEW_STATUS_ORDER = ["incomplete", "needs_review", "needs_follow_up", "ready"]
 REVIEW_PRIORITY_ORDER = ["high", "medium", "low", "ready"]
+FLAG_SEVERITY_ORDER = ["critical", "high", "medium", "clean"]
 QUALITY_TIERS = [
     ("excellent", 90),
     ("good", 75),
     ("needs_attention", 50),
     ("critical", 0),
 ]
+WEEKDAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+READINESS_BUCKETS = [
+    ("ready", 85),
+    ("needs_follow_up", 65),
+    ("needs_review", 45),
+    ("incomplete", 0),
+]
+SUBMISSION_AGE_BUCKETS = [
+    ("0-7 days", 7),
+    ("8-14 days", 14),
+    ("15-30 days", 30),
+    ("31-60 days", 60),
+    ("61-90 days", 90),
+    ("90+ days", 10_000),
+]
+SUBMISSION_RECENCY_BUCKETS = [
+    ("fresh", 7),
+    ("active", 30),
+    ("stale", 60),
+    ("backlog", 90),
+    ("archive", 10_000),
+]
+STALE_SUBMISSION_DAYS = 30
 CRITICAL_FLAGS = {
     "missing_applicant_id",
     "missing_name",
@@ -59,6 +115,7 @@ HIGH_FLAGS = {
     "gpa_out_of_range",
     "invalid_gpa",
     "future_submission_date",
+    "missing_submission_date",
 }
 HEADER_ALIASES = {
     "applicant id": "applicant_id",
@@ -78,8 +135,33 @@ HEADER_ALIASES = {
     "first-generation": "first_gen",
     "notes": "eligibility_notes",
     "eligibility note": "eligibility_notes",
+    "referral source": "referral_source",
+    "source": "referral_source",
+    "channel": "referral_source",
+    "referred by": "referral_source",
 }
 EMAIL_AT = "@"
+PERSONAL_EMAIL_DOMAINS = {
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "icloud.com",
+    "aol.com",
+    "protonmail.com",
+    "live.com",
+}
+EMAIL_DOMAIN_CATEGORY_ORDER = [
+    "education",
+    "nonprofit",
+    "government",
+    "network",
+    "personal",
+    "commercial",
+    "other",
+    "invalid",
+    "missing",
+]
 
 
 
@@ -102,6 +184,17 @@ def normalize_program(value: str) -> str:
 
 def parse_bool(value: str) -> bool:
     return value.strip().lower() in {"yes", "y", "true", "1"}
+
+
+def normalize_referral_source(value: str) -> Optional[str]:
+    if not value:
+        return None
+    raw = value.strip()
+    if not raw:
+        return None
+    key = raw.lower().replace("-", " ").replace("/", " ").strip()
+    key = " ".join(key.split())
+    return REFERRAL_SOURCE_ALIASES.get(key, raw.title())
 
 
 def normalize_income_bracket(value: str) -> Optional[str]:
@@ -189,6 +282,29 @@ def email_domain(value: str) -> Optional[str]:
     return domain or None
 
 
+def email_domain_category(value: Optional[str]) -> str:
+    if not value:
+        return "missing"
+    if not is_email(value):
+        return "invalid"
+    domain = email_domain(value)
+    if not domain:
+        return "invalid"
+    if domain.endswith(".edu"):
+        return "education"
+    if domain.endswith(".org"):
+        return "nonprofit"
+    if domain.endswith(".gov"):
+        return "government"
+    if domain.endswith(".net"):
+        return "network"
+    if domain in PERSONAL_EMAIL_DOMAINS:
+        return "personal"
+    if domain.endswith(".com"):
+        return "commercial"
+    return "other"
+
+
 def read_applications(path: Path) -> List[Dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
@@ -197,10 +313,12 @@ def read_applications(path: Path) -> List[Dict[str, str]]:
 
 def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     email = row.get("email", "").strip() or None
+    email_category = email_domain_category(email)
     income = normalize_income_bracket(row.get("income_bracket", ""))
     gpa, invalid_gpa = parse_gpa(row.get("gpa", ""))
     raw_program = row.get("program", "").strip()
     program = normalize_program(raw_program) if raw_program else "Unspecified"
+    referral_source = normalize_referral_source(row.get("referral_source", ""))
     eligibility_notes = row.get("eligibility_notes", "").strip() or None
     note_tags = extract_note_tags(eligibility_notes)
     flags = []
@@ -214,6 +332,8 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         flags.append("invalid_email")
     if not raw_program:
         flags.append("missing_program")
+    if not referral_source:
+        flags.append("missing_referral_source")
     if not income:
         flags.append("missing_income")
     if gpa is not None:
@@ -226,26 +346,52 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     submission = parse_date(row.get("submission_date", ""))
     if submission is None and row.get("submission_date"):
         flags.append("invalid_submission_date")
+    if not row.get("submission_date", "").strip():
+        flags.append("missing_submission_date")
     if submission and submission > date.today().isoformat():
         flags.append("future_submission_date")
 
+    submission_age_days = None
+    submission_age_bucket_value = None
+    if submission:
+        days_delta = (date.today() - date.fromisoformat(submission)).days
+        if days_delta >= 0:
+            submission_age_days = days_delta
+            submission_age_bucket_value = submission_age_bucket(days_delta)
+        else:
+            submission_age_bucket_value = "future"
+    if submission_age_days is not None and submission_age_days >= STALE_SUBMISSION_DAYS:
+        flags.append("stale_submission")
+    submission_recency_value = submission_recency(submission_age_days)
+
     review_status, review_priority = derive_review_status(flags)
     data_quality_score = compute_quality_score(flags)
+    readiness_score = compute_readiness_score(flags)
+    readiness_bucket_value = readiness_bucket(readiness_score)
+    flag_severity_value = flag_severity(flags)
     return NormalizedApplication(
         applicant_id=row.get("applicant_id", "").strip(),
         name=row.get("name", "").strip(),
         email=email,
+        email_domain_category=email_category,
         program=program,
+        referral_source=referral_source,
         gpa=gpa,
         income_bracket=income,
         submission_date=submission,
+        submission_age_days=submission_age_days,
+        submission_age_bucket=submission_age_bucket_value,
+        submission_recency=submission_recency_value,
         first_gen=parse_bool(row.get("first_gen", "")),
         eligibility_notes=eligibility_notes,
         note_tags=note_tags,
         flags=flags,
+        flag_severity=flag_severity_value,
         review_status=review_status,
         review_priority=review_priority,
         data_quality_score=data_quality_score,
+        readiness_score=readiness_score,
+        readiness_bucket=readiness_bucket_value,
     )
 
 
@@ -285,6 +431,16 @@ def derive_review_status(flags: List[str]) -> Tuple[str, str]:
     return "ready", "ready"
 
 
+def flag_severity(flags: List[str]) -> str:
+    if any(flag in CRITICAL_FLAGS for flag in flags):
+        return "critical"
+    if any(flag in HIGH_FLAGS for flag in flags):
+        return "high"
+    if flags:
+        return "medium"
+    return "clean"
+
+
 def compute_quality_score(flags: List[str]) -> int:
     score = 100
     for flag in flags:
@@ -297,6 +453,18 @@ def compute_quality_score(flags: List[str]) -> int:
     return max(0, score)
 
 
+def compute_readiness_score(flags: List[str]) -> int:
+    score = 100
+    for flag in flags:
+        if flag in CRITICAL_FLAGS:
+            score -= 30
+        elif flag in HIGH_FLAGS:
+            score -= 15
+        else:
+            score -= 8
+    return max(0, score)
+
+
 def quality_tier(score: int) -> str:
     for tier, cutoff in QUALITY_TIERS:
         if score >= cutoff:
@@ -304,10 +472,53 @@ def quality_tier(score: int) -> str:
     return "critical"
 
 
+def readiness_bucket(score: int) -> str:
+    for bucket, cutoff in READINESS_BUCKETS:
+        if score >= cutoff:
+            return bucket
+    return "incomplete"
+
+
+def submission_age_bucket(age_days: int) -> str:
+    for bucket, cutoff in SUBMISSION_AGE_BUCKETS:
+        if age_days <= cutoff:
+            return bucket
+    return "90+ days"
+
+
+def submission_recency(age_days: Optional[int]) -> str:
+    if age_days is None:
+        return "missing"
+    if age_days < 0:
+        return "future"
+    for bucket, cutoff in SUBMISSION_RECENCY_BUCKETS:
+        if age_days <= cutoff:
+            return bucket
+    return "archive"
+
+
 def update_review_status(apps: List[NormalizedApplication]) -> None:
     for app in apps:
         app.review_status, app.review_priority = derive_review_status(app.flags)
         app.data_quality_score = compute_quality_score(app.flags)
+        app.readiness_score = compute_readiness_score(app.flags)
+        app.readiness_bucket = readiness_bucket(app.readiness_score)
+        app.flag_severity = flag_severity(app.flags)
+        if app.submission_date:
+            days_delta = (date.today() - date.fromisoformat(app.submission_date)).days
+            if days_delta >= 0:
+                app.submission_age_days = days_delta
+                app.submission_age_bucket = submission_age_bucket(days_delta)
+            else:
+                app.submission_age_days = None
+                app.submission_age_bucket = "future"
+        app.submission_recency = submission_recency(app.submission_age_days)
+        if app.submission_age_days is not None and app.submission_age_days >= STALE_SUBMISSION_DAYS:
+            if "stale_submission" not in app.flags:
+                app.flags.append("stale_submission")
+        else:
+            if "stale_submission" in app.flags:
+                app.flags.remove("stale_submission")
 
 
 def build_summary(
@@ -317,15 +528,21 @@ def build_summary(
 ) -> Summary:
     program_counts: Dict[str, int] = {}
     program_gpas: Dict[str, List[float]] = {}
+    referral_source_counts: Dict[str, int] = {}
     income_bracket_counts: Dict[str, int] = {}
     note_tag_counts: Dict[str, int] = {}
+    email_domain_counts: Dict[str, int] = {}
+    email_domain_category_counts: Dict[str, int] = {}
+    submission_weekday_counts: Dict[str, int] = {}
     review_status_counts: Dict[str, int] = {}
     review_priority_counts: Dict[str, int] = {}
+    flag_severity_counts: Dict[str, int] = {}
     missing_applicant_id = 0
     missing_name = 0
     missing_email = 0
     invalid_email = 0
     missing_program = 0
+    missing_referral_source = 0
     missing_income = 0
     low_gpa = 0
     invalid_gpa = 0
@@ -333,14 +550,25 @@ def build_summary(
     first_gen = 0
     invalid_submission_date = 0
     future_submission_date = 0
+    missing_submission_date = 0
+    stale_submission = 0
     submission_dates: List[str] = []
     flagged_applications = 0
     gpas: List[float] = []
     quality_scores: List[int] = []
     quality_tier_counts: Dict[str, int] = {}
+    readiness_scores: List[int] = []
+    readiness_bucket_counts: Dict[str, int] = {}
+    submission_age_values: List[int] = []
+    submission_age_bucket_counts: Dict[str, int] = {}
+    submission_recency_counts: Dict[str, int] = {}
 
     for app in apps:
         program_counts[app.program] = program_counts.get(app.program, 0) + 1
+        if app.referral_source:
+            referral_source_counts[app.referral_source] = (
+                referral_source_counts.get(app.referral_source, 0) + 1
+            )
         if app.gpa is not None:
             gpas.append(app.gpa)
             program_gpas.setdefault(app.program, []).append(app.gpa)
@@ -349,8 +577,16 @@ def build_summary(
         if app.note_tags:
             for tag in app.note_tags:
                 note_tag_counts[tag] = note_tag_counts.get(tag, 0) + 1
+        if app.email:
+            domain = email_domain(app.email)
+            if domain:
+                email_domain_counts[domain] = email_domain_counts.get(domain, 0) + 1
+        email_domain_category_counts[app.email_domain_category] = (
+            email_domain_category_counts.get(app.email_domain_category, 0) + 1
+        )
         review_status_counts[app.review_status] = review_status_counts.get(app.review_status, 0) + 1
         review_priority_counts[app.review_priority] = review_priority_counts.get(app.review_priority, 0) + 1
+        flag_severity_counts[app.flag_severity] = flag_severity_counts.get(app.flag_severity, 0) + 1
         if "missing_applicant_id" in app.flags:
             missing_applicant_id += 1
         if "missing_name" in app.flags:
@@ -361,6 +597,8 @@ def build_summary(
             invalid_email += 1
         if "missing_program" in app.flags:
             missing_program += 1
+        if "missing_referral_source" in app.flags:
+            missing_referral_source += 1
         if "missing_income" in app.flags:
             missing_income += 1
         if "low_gpa" in app.flags:
@@ -375,13 +613,30 @@ def build_summary(
             invalid_submission_date += 1
         if "future_submission_date" in app.flags:
             future_submission_date += 1
+        if "missing_submission_date" in app.flags:
+            missing_submission_date += 1
+        if "stale_submission" in app.flags:
+            stale_submission += 1
         if app.submission_date:
             submission_dates.append(app.submission_date)
+            weekday = date.fromisoformat(app.submission_date).strftime("%A")
+            submission_weekday_counts[weekday] = submission_weekday_counts.get(weekday, 0) + 1
+            if app.submission_age_days is not None:
+                submission_age_values.append(app.submission_age_days)
+            if app.submission_age_bucket:
+                submission_age_bucket_counts[app.submission_age_bucket] = (
+                    submission_age_bucket_counts.get(app.submission_age_bucket, 0) + 1
+                )
+        submission_recency_counts[app.submission_recency] = submission_recency_counts.get(
+            app.submission_recency, 0
+        ) + 1
         if app.flags:
             flagged_applications += 1
         quality_scores.append(app.data_quality_score)
         tier = quality_tier(app.data_quality_score)
         quality_tier_counts[tier] = quality_tier_counts.get(tier, 0) + 1
+        readiness_scores.append(app.readiness_score)
+        readiness_bucket_counts[app.readiness_bucket] = readiness_bucket_counts.get(app.readiness_bucket, 0) + 1
 
     submission_dates.sort()
     submission_start = submission_dates[0] if submission_dates else None
@@ -396,6 +651,14 @@ def build_summary(
     data_quality_avg = round(sum(quality_scores) / len(quality_scores), 1) if quality_scores else None
     data_quality_min = min(quality_scores) if quality_scores else None
     data_quality_max = max(quality_scores) if quality_scores else None
+    readiness_avg = round(sum(readiness_scores) / len(readiness_scores), 1) if readiness_scores else None
+    readiness_min = min(readiness_scores) if readiness_scores else None
+    readiness_max = max(readiness_scores) if readiness_scores else None
+    submission_age_avg = (
+        round(sum(submission_age_values) / len(submission_age_values), 1) if submission_age_values else None
+    )
+    submission_age_min = min(submission_age_values) if submission_age_values else None
+    submission_age_max = max(submission_age_values) if submission_age_values else None
 
     return Summary(
         total_rows=len(apps),
@@ -404,6 +667,7 @@ def build_summary(
         missing_email=missing_email,
         invalid_email=invalid_email,
         missing_program=missing_program,
+        missing_referral_source=missing_referral_source,
         missing_income=missing_income,
         low_gpa=low_gpa,
         invalid_gpa=invalid_gpa,
@@ -411,6 +675,8 @@ def build_summary(
         first_gen=first_gen,
         invalid_submission_date=invalid_submission_date,
         future_submission_date=future_submission_date,
+        missing_submission_date=missing_submission_date,
+        stale_submission=stale_submission,
         duplicate_email=duplicate_email,
         duplicate_applicant_id=duplicate_applicant_id,
         flagged_applications=flagged_applications,
@@ -420,14 +686,28 @@ def build_summary(
         gpa_max=gpa_max,
         program_counts=program_counts,
         program_gpa_avg=program_gpa_avg,
+        referral_source_counts=referral_source_counts,
         income_bracket_counts=income_bracket_counts,
         note_tag_counts=note_tag_counts,
+        email_domain_counts=email_domain_counts,
+        email_domain_category_counts=email_domain_category_counts,
+        submission_weekday_counts=submission_weekday_counts,
         review_status_counts=review_status_counts,
         review_priority_counts=review_priority_counts,
+        flag_severity_counts=flag_severity_counts,
         data_quality_avg=data_quality_avg,
         data_quality_min=data_quality_min,
         data_quality_max=data_quality_max,
         quality_tier_counts=quality_tier_counts,
+        readiness_avg=readiness_avg,
+        readiness_min=readiness_min,
+        readiness_max=readiness_max,
+        readiness_bucket_counts=readiness_bucket_counts,
+        submission_age_avg=submission_age_avg,
+        submission_age_min=submission_age_min,
+        submission_age_max=submission_age_max,
+        submission_age_bucket_counts=submission_age_bucket_counts,
+        submission_recency_counts=submission_recency_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -452,6 +732,7 @@ def write_report(summary: Summary, path: Path) -> None:
         f"Missing email: {summary.missing_email}",
         f"Invalid email: {summary.invalid_email}",
         f"Missing program: {summary.missing_program}",
+        f"Missing referral source: {summary.missing_referral_source}",
         f"Missing income: {summary.missing_income}",
         f"Low GPA (<2.5): {summary.low_gpa}",
         f"Invalid GPA: {summary.invalid_gpa}",
@@ -461,11 +742,17 @@ def write_report(summary: Summary, path: Path) -> None:
         f"First-gen applicants: {summary.first_gen}",
         f"Invalid submission date: {summary.invalid_submission_date}",
         f"Future submission date: {summary.future_submission_date}",
+        f"Missing submission date: {summary.missing_submission_date}",
+        f"Stale submissions (>= {STALE_SUBMISSION_DAYS} days): {summary.stale_submission}",
         f"Duplicate emails: {summary.duplicate_email}",
         f"Duplicate applicant IDs: {summary.duplicate_applicant_id}",
         f"Flagged applications: {summary.flagged_applications} ({summary.flagged_rate}%)",
         f"Data quality average: {summary.data_quality_avg if summary.data_quality_avg is not None else 'n/a'}",
         f"Data quality range: {summary.data_quality_min if summary.data_quality_min is not None else 'n/a'} to {summary.data_quality_max if summary.data_quality_max is not None else 'n/a'}",
+        f"Readiness average: {summary.readiness_avg if summary.readiness_avg is not None else 'n/a'}",
+        f"Readiness range: {summary.readiness_min if summary.readiness_min is not None else 'n/a'} to {summary.readiness_max if summary.readiness_max is not None else 'n/a'}",
+        f"Submission age average (days): {summary.submission_age_avg if summary.submission_age_avg is not None else 'n/a'}",
+        f"Submission age range (days): {summary.submission_age_min if summary.submission_age_min is not None else 'n/a'} to {summary.submission_age_max if summary.submission_age_max is not None else 'n/a'}",
         f"Submission window: {summary.submission_start or 'n/a'} to {summary.submission_end or 'n/a'}",
         "",
         "## Data quality tiers",
@@ -473,6 +760,15 @@ def write_report(summary: Summary, path: Path) -> None:
     for tier, _ in QUALITY_TIERS:
         count = summary.quality_tier_counts.get(tier, 0)
         lines.append(f"- {tier.replace('_', ' ').title()}: {count}")
+    lines.extend(
+        [
+            "",
+            "## Readiness buckets",
+        ]
+    )
+    for bucket, _ in READINESS_BUCKETS:
+        count = summary.readiness_bucket_counts.get(bucket, 0)
+        lines.append(f"- {bucket.replace('_', ' ').title()}: {count}")
     lines.extend(
         [
             "",
@@ -491,6 +787,10 @@ def write_report(summary: Summary, path: Path) -> None:
     for priority in REVIEW_PRIORITY_ORDER:
         count = summary.review_priority_counts.get(priority, 0)
         lines.append(f"- {priority.replace('_', ' ').title()}: {count}")
+    lines.extend(["", "## Flag severity"])
+    for severity in FLAG_SEVERITY_ORDER:
+        count = summary.flag_severity_counts.get(severity, 0)
+        lines.append(f"- {severity.replace('_', ' ').title()}: {count}")
     lines.extend(["", "## Applications by program"])
     for program, count in sorted(summary.program_counts.items()):
         lines.append(f"- {program}: {count}")
@@ -503,10 +803,70 @@ def write_report(summary: Summary, path: Path) -> None:
     for bracket, count in sorted(summary.income_bracket_counts.items()):
         lines.append(f"- {bracket}: {count}")
     lines.append("")
+    lines.append("## Applications by referral source")
+    if summary.referral_source_counts:
+        for source, count in sorted(summary.referral_source_counts.items()):
+            lines.append(f"- {source}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
     lines.append("## Eligibility note tags")
     if summary.note_tag_counts:
         for tag, count in sorted(summary.note_tag_counts.items()):
             lines.append(f"- {tag.replace('_', ' ').title()}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Top email domains")
+    if summary.email_domain_counts:
+        top_domains = sorted(
+            summary.email_domain_counts.items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )[:5]
+        for domain, count in top_domains:
+            lines.append(f"- {domain}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Email domain categories")
+    if summary.email_domain_category_counts:
+        for category in EMAIL_DOMAIN_CATEGORY_ORDER:
+            count = summary.email_domain_category_counts.get(category, 0)
+            lines.append(f"- {category.replace('_', ' ').title()}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Submissions by weekday")
+    if summary.submission_weekday_counts:
+        for weekday in WEEKDAY_ORDER:
+            count = summary.submission_weekday_counts.get(weekday, 0)
+            lines.append(f"- {weekday}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Submission age buckets")
+    if summary.submission_age_bucket_counts:
+        for bucket, _ in SUBMISSION_AGE_BUCKETS:
+            count = summary.submission_age_bucket_counts.get(bucket, 0)
+            lines.append(f"- {bucket}: {count}")
+        future_count = summary.submission_age_bucket_counts.get("future")
+        if future_count:
+            lines.append(f"- Future: {future_count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Submission recency")
+    if summary.submission_recency_counts:
+        for bucket, _ in SUBMISSION_RECENCY_BUCKETS:
+            count = summary.submission_recency_counts.get(bucket, 0)
+            lines.append(f"- {bucket.title()}: {count}")
+        missing_count = summary.submission_recency_counts.get("missing")
+        if missing_count:
+            lines.append(f"- Missing: {missing_count}")
+        future_count = summary.submission_recency_counts.get("future")
+        if future_count:
+            lines.append(f"- Future: {future_count}")
     else:
         lines.append("- n/a")
     lines.append("")
@@ -524,12 +884,15 @@ def follow_up_reason(flags: List[str]) -> str:
         "missing_email": "Missing email",
         "invalid_email": "Invalid email",
         "missing_program": "Missing program",
+        "missing_referral_source": "Missing referral source",
         "missing_income": "Missing income bracket",
         "low_gpa": "Low GPA",
         "invalid_gpa": "Invalid GPA format",
         "gpa_out_of_range": "GPA out of range",
         "invalid_submission_date": "Invalid submission date",
         "future_submission_date": "Submission date in future",
+        "missing_submission_date": "Missing submission date",
+        "stale_submission": f"Submission older than {STALE_SUBMISSION_DAYS} days",
         "duplicate_email": "Duplicate email",
         "duplicate_applicant_id": "Duplicate applicant ID",
     }
@@ -548,11 +911,18 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "name": app.name,
                 "email": app.email or "",
                 "program": app.program,
+                "referral_source": app.referral_source or "",
                 "submission_date": app.submission_date or "",
+                "submission_age_days": app.submission_age_days if app.submission_age_days is not None else "",
+                "submission_age_bucket": app.submission_age_bucket or "",
+                "submission_recency": app.submission_recency,
                 "flags": "; ".join(app.flags),
+                "flag_severity": app.flag_severity,
                 "review_status": app.review_status,
                 "data_quality_score": app.data_quality_score,
                 "quality_tier": quality_tier(app.data_quality_score),
+                "readiness_score": app.readiness_score,
+                "readiness_bucket": app.readiness_bucket,
                 "follow_up_reason": follow_up_reason(app.flags),
             }
         )
@@ -564,11 +934,18 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "name",
                 "email",
                 "program",
+                "referral_source",
                 "submission_date",
+                "submission_age_days",
+                "submission_age_bucket",
+                "submission_recency",
                 "flags",
+                "flag_severity",
                 "review_status",
                 "data_quality_score",
                 "quality_tier",
+                "readiness_score",
+                "readiness_bucket",
                 "follow_up_reason",
             ],
         )
@@ -578,14 +955,9 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
 
 def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scorecard:
     flag_totals: Dict[str, int] = {}
-    email_domains: Dict[str, int] = {}
     for app in apps:
         for flag in app.flags:
             flag_totals[flag] = flag_totals.get(flag, 0) + 1
-        if app.email:
-            domain = email_domain(app.email)
-            if domain:
-                email_domains[domain] = email_domains.get(domain, 0) + 1
     flag_rates = {
         flag: round(count / summary.total_rows, 4) if summary.total_rows else 0.0
         for flag, count in flag_totals.items()
@@ -597,18 +969,33 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         flag_rates=flag_rates,
         program_counts=summary.program_counts,
         program_gpa_avg=summary.program_gpa_avg,
+        referral_source_counts=summary.referral_source_counts,
         income_bracket_counts=summary.income_bracket_counts,
-        email_domain_counts=dict(sorted(email_domains.items(), key=lambda item: item[1], reverse=True)),
+        email_domain_counts=dict(
+            sorted(summary.email_domain_counts.items(), key=lambda item: item[1], reverse=True)
+        ),
+        email_domain_category_counts=summary.email_domain_category_counts,
         note_tag_counts=summary.note_tag_counts,
+        submission_weekday_counts=summary.submission_weekday_counts,
         review_status_counts=summary.review_status_counts,
         review_priority_counts=summary.review_priority_counts,
+        flag_severity_counts=summary.flag_severity_counts,
         data_quality_avg=summary.data_quality_avg,
         data_quality_min=summary.data_quality_min,
         data_quality_max=summary.data_quality_max,
         quality_tier_counts=summary.quality_tier_counts,
+        readiness_avg=summary.readiness_avg,
+        readiness_min=summary.readiness_min,
+        readiness_max=summary.readiness_max,
+        readiness_bucket_counts=summary.readiness_bucket_counts,
         gpa_avg=summary.gpa_avg,
         gpa_min=summary.gpa_min,
         gpa_max=summary.gpa_max,
+        submission_age_avg=summary.submission_age_avg,
+        submission_age_min=summary.submission_age_min,
+        submission_age_max=summary.submission_age_max,
+        submission_age_bucket_counts=summary.submission_age_bucket_counts,
+        submission_recency_counts=summary.submission_recency_counts,
         submission_start=summary.submission_start,
         submission_end=summary.submission_end,
     )

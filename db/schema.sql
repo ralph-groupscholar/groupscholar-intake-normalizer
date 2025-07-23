@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   missing_email INTEGER NOT NULL,
   invalid_email INTEGER NOT NULL,
   missing_program INTEGER NOT NULL,
+  missing_referral_source INTEGER NOT NULL DEFAULT 0,
   missing_income INTEGER NOT NULL,
   low_gpa INTEGER NOT NULL,
   invalid_gpa INTEGER NOT NULL,
@@ -17,6 +18,8 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   first_gen INTEGER NOT NULL,
   invalid_submission_date INTEGER NOT NULL,
   future_submission_date INTEGER NOT NULL,
+  missing_submission_date INTEGER NOT NULL DEFAULT 0,
+  stale_submission INTEGER NOT NULL DEFAULT 0,
   duplicate_email INTEGER NOT NULL,
   duplicate_applicant_id INTEGER NOT NULL,
   flagged_applications INTEGER NOT NULL,
@@ -28,14 +31,28 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.batches (
   submission_end DATE,
   program_counts JSONB NOT NULL,
   program_gpa_avg JSONB NOT NULL,
+  referral_source_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  email_domain_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  email_domain_category_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  submission_weekday_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  flag_severity_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   data_quality_avg NUMERIC(5, 2),
   data_quality_min INTEGER,
   data_quality_max INTEGER,
-  quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb
+  quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  readiness_avg NUMERIC(5, 2),
+  readiness_min INTEGER,
+  readiness_max INTEGER,
+  readiness_bucket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  submission_age_avg NUMERIC(6, 2),
+  submission_age_min INTEGER,
+  submission_age_max INTEGER,
+  submission_age_bucket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  submission_recency_counts JSONB NOT NULL DEFAULT '{}'::jsonb
 );
 
 CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
@@ -45,16 +62,24 @@ CREATE TABLE IF NOT EXISTS intake_normalizer.applications (
   name TEXT NOT NULL,
   email TEXT,
   program TEXT NOT NULL,
+  referral_source TEXT,
   gpa NUMERIC(4, 2),
   income_bracket TEXT,
   submission_date DATE,
+  submission_age_days INTEGER,
+  submission_age_bucket TEXT,
+  submission_recency TEXT NOT NULL DEFAULT 'missing',
   first_gen BOOLEAN NOT NULL DEFAULT FALSE,
+  email_domain_category TEXT NOT NULL DEFAULT 'missing',
   eligibility_notes TEXT,
   note_tags TEXT[] NOT NULL DEFAULT '{}',
   flags TEXT[] NOT NULL,
+  flag_severity TEXT NOT NULL DEFAULT 'clean',
   review_status TEXT NOT NULL DEFAULT 'ready',
   review_priority TEXT NOT NULL DEFAULT 'ready',
-  data_quality_score INTEGER NOT NULL DEFAULT 100
+  data_quality_score INTEGER NOT NULL DEFAULT 100,
+  readiness_score INTEGER NOT NULL DEFAULT 100,
+  readiness_bucket TEXT NOT NULL DEFAULT 'ready'
 );
 
 
@@ -65,6 +90,7 @@ ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS gpa_out_of_range INTEGER NOT NULL DEFAULT 0;
 
 ALTER TABLE intake_normalizer.batches
+  ADD COLUMN IF NOT EXISTS missing_referral_source INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS missing_name INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS duplicate_applicant_id INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS flagged_applications INTEGER NOT NULL DEFAULT 0,
@@ -73,20 +99,44 @@ ALTER TABLE intake_normalizer.batches
   ADD COLUMN IF NOT EXISTS gpa_min NUMERIC(4, 2),
   ADD COLUMN IF NOT EXISTS gpa_max NUMERIC(4, 2),
   ADD COLUMN IF NOT EXISTS program_gpa_avg JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS referral_source_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS income_bracket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS note_tag_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS email_domain_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS email_domain_category_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS submission_weekday_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS review_status_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS review_priority_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS flag_severity_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS data_quality_avg NUMERIC(5, 2),
   ADD COLUMN IF NOT EXISTS data_quality_min INTEGER,
   ADD COLUMN IF NOT EXISTS data_quality_max INTEGER,
-  ADD COLUMN IF NOT EXISTS quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS quality_tier_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS readiness_avg NUMERIC(5, 2),
+  ADD COLUMN IF NOT EXISTS readiness_min INTEGER,
+  ADD COLUMN IF NOT EXISTS readiness_max INTEGER,
+  ADD COLUMN IF NOT EXISTS readiness_bucket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS missing_submission_date INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS stale_submission INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS submission_age_avg NUMERIC(6, 2),
+  ADD COLUMN IF NOT EXISTS submission_age_min INTEGER,
+  ADD COLUMN IF NOT EXISTS submission_age_max INTEGER,
+  ADD COLUMN IF NOT EXISTS submission_age_bucket_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS submission_recency_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 ALTER TABLE intake_normalizer.applications
   ADD COLUMN IF NOT EXISTS note_tags TEXT[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS referral_source TEXT,
   ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'ready',
   ADD COLUMN IF NOT EXISTS review_priority TEXT NOT NULL DEFAULT 'ready',
-  ADD COLUMN IF NOT EXISTS data_quality_score INTEGER NOT NULL DEFAULT 100;
+  ADD COLUMN IF NOT EXISTS data_quality_score INTEGER NOT NULL DEFAULT 100,
+  ADD COLUMN IF NOT EXISTS readiness_score INTEGER NOT NULL DEFAULT 100,
+  ADD COLUMN IF NOT EXISTS readiness_bucket TEXT NOT NULL DEFAULT 'ready',
+  ADD COLUMN IF NOT EXISTS flag_severity TEXT NOT NULL DEFAULT 'clean',
+  ADD COLUMN IF NOT EXISTS submission_age_days INTEGER,
+  ADD COLUMN IF NOT EXISTS submission_age_bucket TEXT,
+  ADD COLUMN IF NOT EXISTS submission_recency TEXT NOT NULL DEFAULT 'missing',
+  ADD COLUMN IF NOT EXISTS email_domain_category TEXT NOT NULL DEFAULT 'missing';
 
 CREATE INDEX IF NOT EXISTS idx_intake_normalizer_program
   ON intake_normalizer.applications(program);

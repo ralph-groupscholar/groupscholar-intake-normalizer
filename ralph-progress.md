@@ -48,7 +48,22 @@
 - Updated Postgres schema and indexes to support review status/priority analytics and reseeded the production batch.
 - Regenerated sample outputs to reflect review readiness and priority metrics.
 
+## Iteration 124
+- Added readiness scoring and bucket tracking to normalized applications, scorecards, and issue exports.
+- Extended Postgres schema + exports to persist readiness metrics and reseeded the production intake batch.
+- Refreshed sample outputs and summary report with readiness score statistics.
+
 ## Iteration 111
 - Added data quality scoring with tiering to the normalization pipeline and exposed scores in JSON, scorecards, and issue exports.
 - Extended summary reporting to include data quality averages/ranges plus tier counts for quick triage.
 - Updated Postgres schema + exports for data quality metrics and reseeded the production intake_normalizer batch.
+
+## Iteration 63
+- Added submission recency tracking across normalized rows, scorecards, summaries, and issues exports.
+- Extended Postgres schema and batch/application exports to persist recency buckets and counts.
+- Regenerated sample outputs and confirmed test coverage for recency buckets.
+
+## Iteration 66
+- Captured email domain categories on each normalized application and summarized them in reports/scorecards.
+- Persisted referral sources and email domain categories in the Postgres schema and batch exports.
+- Regenerated sample outputs and expanded unit tests for email domain category counts.
