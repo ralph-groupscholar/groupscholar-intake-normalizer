@@ -11,6 +11,14 @@ from typing import Dict, List, Optional, Tuple
 from models import NormalizedApplication, Scorecard, Summary
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y/%m/%d", "%m/%d/%Y"]
+DATETIME_FORMATS = [
+    "%Y-%m-%d %H:%M",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y/%m/%d %H:%M",
+    "%m/%d/%Y %H:%M",
+    "%Y-%m-%dT%H:%M",
+    "%Y-%m-%dT%H:%M:%S",
+]
 PROGRAM_ALIASES = {
     "stem scholars": "STEM Scholars",
     "arts catalyst": "Arts Catalyst",
@@ -81,6 +89,14 @@ QUALITY_TIERS = [
     ("critical", 0),
 ]
 WEEKDAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+SUBMISSION_TIME_BUCKET_ORDER = [
+    "early_morning",
+    "morning",
+    "afternoon",
+    "evening",
+    "late_night",
+    "unknown",
+]
 READINESS_BUCKETS = [
     ("ready", 85),
     ("needs_follow_up", 65),
@@ -102,6 +118,9 @@ SUBMISSION_RECENCY_BUCKETS = [
     ("backlog", 90),
     ("archive", 10_000),
 ]
+GRADUATION_YEAR_BUCKETS = ["overdue", "current", "next_year", "future", "unknown"]
+GRAD_YEAR_MIN_OFFSET = -1
+GRAD_YEAR_MAX_OFFSET = 6
 STALE_SUBMISSION_DAYS = 30
 CRITICAL_FLAGS = {
     "missing_applicant_id",
@@ -116,6 +135,10 @@ HIGH_FLAGS = {
     "invalid_gpa",
     "future_submission_date",
     "missing_submission_date",
+    "graduation_year_out_of_range",
+    "invalid_graduation_year",
+    "missing_citizenship_status",
+    "unrecognized_citizenship_status",
 }
 HEADER_ALIASES = {
     "applicant id": "applicant_id",
@@ -124,6 +147,13 @@ HEADER_ALIASES = {
     "full name": "name",
     "applicant name": "name",
     "email address": "email",
+    "phone": "phone",
+    "phone number": "phone",
+    "phone_number": "phone",
+    "mobile": "phone",
+    "mobile phone": "phone",
+    "cell": "phone",
+    "cell phone": "phone",
     "program name": "program",
     "income": "income_bracket",
     "income bracket": "income_bracket",
@@ -139,6 +169,21 @@ HEADER_ALIASES = {
     "source": "referral_source",
     "channel": "referral_source",
     "referred by": "referral_source",
+    "citizenship status": "citizenship_status",
+    "citizenship": "citizenship_status",
+    "citizenship_status": "citizenship_status",
+    "graduation year": "graduation_year",
+    "grad year": "graduation_year",
+    "grad_year": "graduation_year",
+    "expected graduation year": "graduation_year",
+    "school type": "school_type",
+    "school_type": "school_type",
+    "school category": "school_type",
+    "school sector": "school_type",
+    "school": "school_type",
+    "citizenship status": "citizenship_status",
+    "citizenship": "citizenship_status",
+    "citizenship_status": "citizenship_status",
 }
 EMAIL_AT = "@"
 PERSONAL_EMAIL_DOMAINS = {
@@ -162,19 +207,156 @@ EMAIL_DOMAIN_CATEGORY_ORDER = [
     "invalid",
     "missing",
 ]
+CONTACT_CHANNEL_ORDER = ["email_and_phone", "email_only", "phone_only", "missing"]
+SCHOOL_TYPE_ALIASES = {
+    "public": "Public",
+    "public school": "Public",
+    "private": "Private",
+    "private school": "Private",
+    "charter": "Charter",
+    "charter school": "Charter",
+    "homeschool": "Homeschool",
+    "home school": "Homeschool",
+    "homeschooled": "Homeschool",
+    "international": "International",
+    "international school": "International",
+    "community college": "Community College",
+    "two year college": "Community College",
+    "two-year college": "Community College",
+    "college": "College",
+    "university": "University",
+    "trade school": "Trade School",
+    "vocational": "Trade School",
+    "vocational school": "Trade School",
+}
+SCHOOL_TYPE_ORDER = [
+    "Public",
+    "Charter",
+    "Private",
+    "Homeschool",
+    "Community College",
+    "College",
+    "University",
+    "Trade School",
+    "International",
+    "Other",
+    "Missing",
+]
+CITIZENSHIP_STATUS_ALIASES = {
+    "us citizen": "US Citizen",
+    "u.s. citizen": "US Citizen",
+    "usa citizen": "US Citizen",
+    "citizen": "US Citizen",
+    "permanent resident": "Permanent Resident",
+    "green card": "Permanent Resident",
+    "resident": "Permanent Resident",
+    "daca": "DACA",
+    "dreamer": "DACA",
+    "international": "International",
+    "international student": "International",
+    "undocumented": "Undocumented",
+    "non citizen": "Undocumented",
+    "other": "Other",
+    "prefer not to say": "Other",
+}
+CITIZENSHIP_STATUS_ORDER = [
+    "US Citizen",
+    "Permanent Resident",
+    "DACA",
+    "Undocumented",
+    "International",
+    "Other",
+    "Missing",
+]
+CITIZENSHIP_ALIASES = {
+    "us citizen": "US Citizen",
+    "u.s. citizen": "US Citizen",
+    "citizen": "US Citizen",
+    "us": "US Citizen",
+    "usa": "US Citizen",
+    "american": "US Citizen",
+    "permanent resident": "Permanent Resident",
+    "green card": "Permanent Resident",
+    "daca": "DACA",
+    "dreamer": "DACA",
+    "international": "International",
+    "intl": "International",
+    "f-1": "International",
+    "undocumented": "Undocumented",
+    "no status": "Undocumented",
+    "other": "Other",
+}
+CITIZENSHIP_STATUS_ORDER = [
+    "US Citizen",
+    "Permanent Resident",
+    "DACA",
+    "International",
+    "Undocumented",
+    "Other",
+    "Missing",
+]
+PHONE_COUNTRY_PREFIXES = [
+    ("1", "US/Canada"),
+    ("44", "United Kingdom"),
+    ("91", "India"),
+    ("61", "Australia"),
+    ("81", "Japan"),
+    ("49", "Germany"),
+    ("33", "France"),
+    ("34", "Spain"),
+    ("39", "Italy"),
+    ("52", "Mexico"),
+    ("55", "Brazil"),
+    ("234", "Nigeria"),
+    ("27", "South Africa"),
+]
+PHONE_COUNTRY_PREFIX_ORDER = sorted(PHONE_COUNTRY_PREFIXES, key=lambda item: len(item[0]), reverse=True)
+PHONE_COUNTRY_ORDER = [
+    "US/Canada",
+    "United Kingdom",
+    "India",
+    "Australia",
+    "Japan",
+    "Germany",
+    "France",
+    "Spain",
+    "Italy",
+    "Mexico",
+    "Brazil",
+    "Nigeria",
+    "South Africa",
+    "International",
+    "invalid",
+    "missing",
+]
 
 
+
+
+def parse_submission_datetime(value: str) -> Tuple[Optional[str], Optional[int]]:
+    if not value:
+        return None, None
+    raw = value.strip()
+    if not raw:
+        return None, None
+    for fmt in DATETIME_FORMATS:
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            return parsed.date().isoformat(), parsed.hour
+        except ValueError:
+            continue
+    for fmt in DATE_FORMATS:
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            return parsed.date().isoformat(), None
+        except ValueError:
+            continue
+    return None, None
 
 
 def parse_date(value: str) -> Optional[str]:
-    if not value:
-        return None
-    for fmt in DATE_FORMATS:
-        try:
-            return datetime.strptime(value.strip(), fmt).date().isoformat()
-        except ValueError:
-            continue
-    return None
+    parsed_date, _ = parse_submission_datetime(value)
+    return parsed_date
 
 
 def normalize_program(value: str) -> str:
@@ -234,6 +416,44 @@ def normalize_income_bracket(value: str) -> Optional[str]:
     return raw
 
 
+def normalize_school_type(value: str) -> Optional[str]:
+    if not value:
+        return None
+    raw = value.strip()
+    if not raw:
+        return None
+    key = raw.lower().replace("-", " ").replace("/", " ").strip()
+    key = " ".join(key.split())
+    return SCHOOL_TYPE_ALIASES.get(key, raw.title())
+
+
+def normalize_citizenship_status(value: str) -> Tuple[Optional[str], bool]:
+    if not value:
+        return None, False
+    raw = value.strip()
+    if not raw:
+        return None, False
+    key = raw.lower().replace("-", " ").replace("/", " ").strip()
+    key = " ".join(key.split())
+    normalized = CITIZENSHIP_STATUS_ALIASES.get(key)
+    if normalized:
+        return normalized, False
+    return "Other", True
+
+
+def normalize_citizenship_status(value: str) -> Tuple[Optional[str], bool]:
+    if not value:
+        return None, False
+    raw = value.strip()
+    if not raw:
+        return None, False
+    key = raw.lower().replace("-", " ").replace("/", " ").strip()
+    key = " ".join(key.split())
+    if key in CITIZENSHIP_ALIASES:
+        return CITIZENSHIP_ALIASES[key], False
+    return "Other", True
+
+
 def parse_gpa(value: str) -> Tuple[Optional[float], bool]:
     if not value:
         return None, False
@@ -241,6 +461,30 @@ def parse_gpa(value: str) -> Tuple[Optional[float], bool]:
         return round(float(value), 2), False
     except ValueError:
         return None, True
+
+
+def parse_graduation_year(value: str) -> Tuple[Optional[int], bool]:
+    if not value:
+        return None, False
+    raw = value.strip()
+    if not raw:
+        return None, False
+    if not raw.isdigit():
+        return None, True
+    return int(raw), False
+
+
+def graduation_year_bucket(year: Optional[int]) -> str:
+    if year is None:
+        return "unknown"
+    current_year = date.today().year
+    if year < current_year:
+        return "overdue"
+    if year == current_year:
+        return "current"
+    if year == current_year + 1:
+        return "next_year"
+    return "future"
 
 
 def extract_note_tags(value: Optional[str]) -> List[str]:
@@ -305,6 +549,44 @@ def email_domain_category(value: Optional[str]) -> str:
     return "other"
 
 
+def contact_channel(email: Optional[str], phone_normalized: Optional[str]) -> str:
+    has_email = is_email(email)
+    has_phone = bool(phone_normalized)
+    if has_email and has_phone:
+        return "email_and_phone"
+    if has_email:
+        return "email_only"
+    if has_phone:
+        return "phone_only"
+    return "missing"
+
+
+def normalize_phone(value: str) -> Tuple[Optional[str], Optional[str], Optional[str], bool]:
+    raw = value.strip() if value else ""
+    if not raw:
+        return None, None, None, False
+    cleaned = re.sub(r"(ext\.?|x|#)\s*\d+$", "", raw, flags=re.IGNORECASE).strip()
+    if re.search(r"[A-Za-z]", cleaned):
+        return raw, None, None, True
+    digits = re.sub(r"\D", "", cleaned)
+    if not digits:
+        return raw, None, None, True
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if len(digits) == 10:
+        return raw, f"+1{digits}", "US/Canada", False
+    if len(digits) == 11 and digits.startswith("1"):
+        return raw, f"+{digits}", "US/Canada", False
+    if 11 <= len(digits) <= 15:
+        country = "International"
+        for prefix, label in PHONE_COUNTRY_PREFIX_ORDER:
+            if digits.startswith(prefix):
+                country = label
+                break
+        return raw, f"+{digits}", country, False
+    return raw, None, None, True
+
+
 def read_applications(path: Path) -> List[Dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
@@ -314,10 +596,21 @@ def read_applications(path: Path) -> List[Dict[str, str]]:
 def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     email = row.get("email", "").strip() or None
     email_category = email_domain_category(email)
+    has_phone_field = "phone" in row
+    phone_value = row.get("phone", "").strip() if has_phone_field else ""
+    phone_raw, phone_normalized, phone_country, invalid_phone = normalize_phone(phone_value)
+    contact_channel_value = contact_channel(email, phone_normalized)
     income = normalize_income_bracket(row.get("income_bracket", ""))
     gpa, invalid_gpa = parse_gpa(row.get("gpa", ""))
+    graduation_year, invalid_graduation_year = parse_graduation_year(
+        row.get("graduation_year", "")
+    )
     raw_program = row.get("program", "").strip()
     program = normalize_program(raw_program) if raw_program else "Unspecified"
+    school_type = normalize_school_type(row.get("school_type", ""))
+    citizenship_status, citizenship_unrecognized = normalize_citizenship_status(
+        row.get("citizenship_status", "")
+    )
     referral_source = normalize_referral_source(row.get("referral_source", ""))
     eligibility_notes = row.get("eligibility_notes", "").strip() or None
     note_tags = extract_note_tags(eligibility_notes)
@@ -332,6 +625,16 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         flags.append("invalid_email")
     if not raw_program:
         flags.append("missing_program")
+    if not school_type:
+        flags.append("missing_school_type")
+    if not citizenship_status:
+        flags.append("missing_citizenship_status")
+    if citizenship_unrecognized:
+        flags.append("unrecognized_citizenship_status")
+    if has_phone_field and not phone_raw:
+        flags.append("missing_phone")
+    elif phone_raw and invalid_phone:
+        flags.append("invalid_phone")
     if not referral_source:
         flags.append("missing_referral_source")
     if not income:
@@ -343,10 +646,23 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
             flags.append("low_gpa")
     if invalid_gpa:
         flags.append("invalid_gpa")
-    submission = parse_date(row.get("submission_date", ""))
-    if submission is None and row.get("submission_date"):
+    if not row.get("graduation_year", "").strip():
+        flags.append("missing_graduation_year")
+    if invalid_graduation_year:
+        flags.append("invalid_graduation_year")
+    if graduation_year is not None:
+        current_year = date.today().year
+        if (
+            graduation_year < current_year + GRAD_YEAR_MIN_OFFSET
+            or graduation_year > current_year + GRAD_YEAR_MAX_OFFSET
+        ):
+            flags.append("graduation_year_out_of_range")
+    submission_value = row.get("submission_date", "")
+    submission, submission_hour = parse_submission_datetime(submission_value)
+    submission_time_bucket_value = submission_time_bucket(submission_hour)
+    if submission is None and submission_value:
         flags.append("invalid_submission_date")
-    if not row.get("submission_date", "").strip():
+    if not submission_value.strip():
         flags.append("missing_submission_date")
     if submission and submission > date.today().isoformat():
         flags.append("future_submission_date")
@@ -369,16 +685,25 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
     readiness_score = compute_readiness_score(flags)
     readiness_bucket_value = readiness_bucket(readiness_score)
     flag_severity_value = flag_severity(flags)
+    graduation_year_bucket_value = graduation_year_bucket(graduation_year)
     return NormalizedApplication(
         applicant_id=row.get("applicant_id", "").strip(),
         name=row.get("name", "").strip(),
         email=email,
+        phone=phone_raw,
+        phone_normalized=phone_normalized,
+        phone_country=phone_country,
+        contact_channel=contact_channel_value,
         email_domain_category=email_category,
         program=program,
+        school_type=school_type,
         referral_source=referral_source,
         gpa=gpa,
         income_bracket=income,
+        citizenship_status=citizenship_status,
         submission_date=submission,
+        submission_hour=submission_hour,
+        submission_time_bucket=submission_time_bucket_value,
         submission_age_days=submission_age_days,
         submission_age_bucket=submission_age_bucket_value,
         submission_recency=submission_recency_value,
@@ -392,12 +717,15 @@ def normalize_row(row: Dict[str, str]) -> NormalizedApplication:
         data_quality_score=data_quality_score,
         readiness_score=readiness_score,
         readiness_bucket=readiness_bucket_value,
+        graduation_year=graduation_year,
+        graduation_year_bucket=graduation_year_bucket_value,
     )
 
 
-def apply_duplicate_flags(apps: List[NormalizedApplication]) -> Tuple[int, int]:
+def apply_duplicate_flags(apps: List[NormalizedApplication]) -> Tuple[int, int, int]:
     email_counts: Dict[str, int] = {}
     id_counts: Dict[str, int] = {}
+    phone_counts: Dict[str, int] = {}
     for app in apps:
         if app.email:
             key = app.email.strip().lower()
@@ -405,6 +733,9 @@ def apply_duplicate_flags(apps: List[NormalizedApplication]) -> Tuple[int, int]:
         if app.applicant_id:
             key = app.applicant_id.strip().lower()
             id_counts[key] = id_counts.get(key, 0) + 1
+        if app.phone_normalized:
+            key = app.phone_normalized.strip()
+            phone_counts[key] = phone_counts.get(key, 0) + 1
 
     for app in apps:
         if app.email:
@@ -415,10 +746,15 @@ def apply_duplicate_flags(apps: List[NormalizedApplication]) -> Tuple[int, int]:
             key = app.applicant_id.strip().lower()
             if id_counts.get(key, 0) > 1 and "duplicate_applicant_id" not in app.flags:
                 app.flags.append("duplicate_applicant_id")
+        if app.phone_normalized:
+            key = app.phone_normalized.strip()
+            if phone_counts.get(key, 0) > 1 and "duplicate_phone" not in app.flags:
+                app.flags.append("duplicate_phone")
 
     duplicate_email = sum(1 for count in email_counts.values() if count > 1)
     duplicate_applicant_id = sum(1 for count in id_counts.values() if count > 1)
-    return duplicate_email, duplicate_applicant_id
+    duplicate_phone = sum(1 for count in phone_counts.values() if count > 1)
+    return duplicate_email, duplicate_applicant_id, duplicate_phone
 
 
 def derive_review_status(flags: List[str]) -> Tuple[str, str]:
@@ -497,6 +833,20 @@ def submission_recency(age_days: Optional[int]) -> str:
     return "archive"
 
 
+def submission_time_bucket(hour: Optional[int]) -> str:
+    if hour is None:
+        return "unknown"
+    if 5 <= hour <= 8:
+        return "early_morning"
+    if 9 <= hour <= 11:
+        return "morning"
+    if 12 <= hour <= 16:
+        return "afternoon"
+    if 17 <= hour <= 20:
+        return "evening"
+    return "late_night"
+
+
 def update_review_status(apps: List[NormalizedApplication]) -> None:
     for app in apps:
         app.review_status, app.review_priority = derive_review_status(app.flags)
@@ -519,22 +869,29 @@ def update_review_status(apps: List[NormalizedApplication]) -> None:
         else:
             if "stale_submission" in app.flags:
                 app.flags.remove("stale_submission")
+        app.graduation_year_bucket = graduation_year_bucket(app.graduation_year)
 
 
 def build_summary(
     apps: List[NormalizedApplication],
     duplicate_email: int,
     duplicate_applicant_id: int,
+    duplicate_phone: int,
 ) -> Summary:
     program_counts: Dict[str, int] = {}
     program_gpas: Dict[str, List[float]] = {}
     first_gen_program_counts: Dict[str, int] = {}
     referral_source_counts: Dict[str, int] = {}
     income_bracket_counts: Dict[str, int] = {}
+    citizenship_status_counts: Dict[str, int] = {}
     note_tag_counts: Dict[str, int] = {}
     email_domain_counts: Dict[str, int] = {}
     email_domain_category_counts: Dict[str, int] = {}
+    phone_country_counts: Dict[str, int] = {}
+    contact_channel_counts: Dict[str, int] = {}
+    school_type_counts: Dict[str, int] = {}
     submission_weekday_counts: Dict[str, int] = {}
+    submission_time_bucket_counts: Dict[str, int] = {}
     review_status_counts: Dict[str, int] = {}
     review_priority_counts: Dict[str, int] = {}
     flag_severity_counts: Dict[str, int] = {}
@@ -542,12 +899,20 @@ def build_summary(
     missing_name = 0
     missing_email = 0
     invalid_email = 0
+    missing_phone = 0
+    invalid_phone = 0
     missing_program = 0
+    missing_school_type = 0
     missing_referral_source = 0
     missing_income = 0
+    missing_citizenship_status = 0
+    unrecognized_citizenship_status = 0
     low_gpa = 0
     invalid_gpa = 0
     gpa_out_of_range = 0
+    missing_graduation_year = 0
+    invalid_graduation_year = 0
+    graduation_year_out_of_range = 0
     first_gen = 0
     invalid_submission_date = 0
     future_submission_date = 0
@@ -563,6 +928,8 @@ def build_summary(
     submission_age_values: List[int] = []
     submission_age_bucket_counts: Dict[str, int] = {}
     submission_recency_counts: Dict[str, int] = {}
+    graduation_year_counts: Dict[str, int] = {}
+    graduation_year_bucket_counts: Dict[str, int] = {}
 
     for app in apps:
         program_counts[app.program] = program_counts.get(app.program, 0) + 1
@@ -572,6 +939,16 @@ def build_summary(
             referral_source_counts[app.referral_source] = (
                 referral_source_counts.get(app.referral_source, 0) + 1
             )
+        if app.citizenship_status:
+            citizenship_status_counts[app.citizenship_status] = (
+                citizenship_status_counts.get(app.citizenship_status, 0) + 1
+            )
+        else:
+            citizenship_status_counts["Missing"] = citizenship_status_counts.get("Missing", 0) + 1
+        if app.school_type:
+            school_type_counts[app.school_type] = school_type_counts.get(app.school_type, 0) + 1
+        else:
+            school_type_counts["Missing"] = school_type_counts.get("Missing", 0) + 1
         if app.gpa is not None:
             gpas.append(app.gpa)
             program_gpas.setdefault(app.program, []).append(app.gpa)
@@ -587,6 +964,18 @@ def build_summary(
         email_domain_category_counts[app.email_domain_category] = (
             email_domain_category_counts.get(app.email_domain_category, 0) + 1
         )
+        if app.phone_country:
+            phone_country_counts[app.phone_country] = phone_country_counts.get(app.phone_country, 0) + 1
+        elif not app.phone:
+            phone_country_counts["missing"] = phone_country_counts.get("missing", 0) + 1
+        else:
+            phone_country_counts["invalid"] = phone_country_counts.get("invalid", 0) + 1
+        contact_channel_counts[app.contact_channel] = (
+            contact_channel_counts.get(app.contact_channel, 0) + 1
+        )
+        submission_time_bucket_counts[app.submission_time_bucket] = (
+            submission_time_bucket_counts.get(app.submission_time_bucket, 0) + 1
+        )
         review_status_counts[app.review_status] = review_status_counts.get(app.review_status, 0) + 1
         review_priority_counts[app.review_priority] = review_priority_counts.get(app.review_priority, 0) + 1
         flag_severity_counts[app.flag_severity] = flag_severity_counts.get(app.flag_severity, 0) + 1
@@ -598,18 +987,34 @@ def build_summary(
             missing_email += 1
         if "invalid_email" in app.flags:
             invalid_email += 1
+        if "missing_phone" in app.flags:
+            missing_phone += 1
+        if "invalid_phone" in app.flags:
+            invalid_phone += 1
         if "missing_program" in app.flags:
             missing_program += 1
+        if "missing_school_type" in app.flags:
+            missing_school_type += 1
         if "missing_referral_source" in app.flags:
             missing_referral_source += 1
         if "missing_income" in app.flags:
             missing_income += 1
+        if "missing_citizenship_status" in app.flags:
+            missing_citizenship_status += 1
+        if "unrecognized_citizenship_status" in app.flags:
+            unrecognized_citizenship_status += 1
         if "low_gpa" in app.flags:
             low_gpa += 1
         if "invalid_gpa" in app.flags:
             invalid_gpa += 1
         if "gpa_out_of_range" in app.flags:
             gpa_out_of_range += 1
+        if "missing_graduation_year" in app.flags:
+            missing_graduation_year += 1
+        if "invalid_graduation_year" in app.flags:
+            invalid_graduation_year += 1
+        if "graduation_year_out_of_range" in app.flags:
+            graduation_year_out_of_range += 1
         if app.first_gen:
             first_gen += 1
         if "invalid_submission_date" in app.flags:
@@ -633,6 +1038,12 @@ def build_summary(
         submission_recency_counts[app.submission_recency] = submission_recency_counts.get(
             app.submission_recency, 0
         ) + 1
+        if app.graduation_year is not None:
+            year_key = str(app.graduation_year)
+            graduation_year_counts[year_key] = graduation_year_counts.get(year_key, 0) + 1
+        graduation_year_bucket_counts[app.graduation_year_bucket] = (
+            graduation_year_bucket_counts.get(app.graduation_year_bucket, 0) + 1
+        )
         if app.flags:
             flagged_applications += 1
         quality_scores.append(app.data_quality_score)
@@ -676,9 +1087,14 @@ def build_summary(
         missing_name=missing_name,
         missing_email=missing_email,
         invalid_email=invalid_email,
+        missing_phone=missing_phone,
+        invalid_phone=invalid_phone,
         missing_program=missing_program,
+        missing_school_type=missing_school_type,
         missing_referral_source=missing_referral_source,
         missing_income=missing_income,
+        missing_citizenship_status=missing_citizenship_status,
+        unrecognized_citizenship_status=unrecognized_citizenship_status,
         low_gpa=low_gpa,
         invalid_gpa=invalid_gpa,
         gpa_out_of_range=gpa_out_of_range,
@@ -688,8 +1104,12 @@ def build_summary(
         future_submission_date=future_submission_date,
         missing_submission_date=missing_submission_date,
         stale_submission=stale_submission,
+        missing_graduation_year=missing_graduation_year,
+        invalid_graduation_year=invalid_graduation_year,
+        graduation_year_out_of_range=graduation_year_out_of_range,
         duplicate_email=duplicate_email,
         duplicate_applicant_id=duplicate_applicant_id,
+        duplicate_phone=duplicate_phone,
         flagged_applications=flagged_applications,
         flagged_rate=flagged_rate,
         gpa_avg=gpa_avg,
@@ -699,12 +1119,17 @@ def build_summary(
         program_gpa_avg=program_gpa_avg,
         first_gen_program_counts=first_gen_program_counts,
         first_gen_program_rates=first_gen_program_rates,
+        school_type_counts=school_type_counts,
         referral_source_counts=referral_source_counts,
         income_bracket_counts=income_bracket_counts,
+        citizenship_status_counts=citizenship_status_counts,
         note_tag_counts=note_tag_counts,
         email_domain_counts=email_domain_counts,
         email_domain_category_counts=email_domain_category_counts,
+        phone_country_counts=phone_country_counts,
+        contact_channel_counts=contact_channel_counts,
         submission_weekday_counts=submission_weekday_counts,
+        submission_time_bucket_counts=submission_time_bucket_counts,
         review_status_counts=review_status_counts,
         review_priority_counts=review_priority_counts,
         flag_severity_counts=flag_severity_counts,
@@ -721,6 +1146,8 @@ def build_summary(
         submission_age_max=submission_age_max,
         submission_age_bucket_counts=submission_age_bucket_counts,
         submission_recency_counts=submission_recency_counts,
+        graduation_year_counts=graduation_year_counts,
+        graduation_year_bucket_counts=graduation_year_bucket_counts,
         submission_start=submission_start,
         submission_end=submission_end,
     )
@@ -747,9 +1174,14 @@ def write_report(summary: Summary, path: Path) -> None:
         f"Missing applicant name: {summary.missing_name}",
         f"Missing email: {summary.missing_email}",
         f"Invalid email: {summary.invalid_email}",
+        f"Missing phone: {summary.missing_phone}",
+        f"Invalid phone: {summary.invalid_phone}",
         f"Missing program: {summary.missing_program}",
+        f"Missing school type: {summary.missing_school_type}",
         f"Missing referral source: {summary.missing_referral_source}",
         f"Missing income: {summary.missing_income}",
+        f"Missing citizenship status: {summary.missing_citizenship_status}",
+        f"Unrecognized citizenship status: {summary.unrecognized_citizenship_status}",
         f"Low GPA (<2.5): {summary.low_gpa}",
         f"Invalid GPA: {summary.invalid_gpa}",
         f"GPA out of range: {summary.gpa_out_of_range}",
@@ -760,8 +1192,12 @@ def write_report(summary: Summary, path: Path) -> None:
         f"Future submission date: {summary.future_submission_date}",
         f"Missing submission date: {summary.missing_submission_date}",
         f"Stale submissions (>= {STALE_SUBMISSION_DAYS} days): {summary.stale_submission}",
+        f"Missing graduation year: {summary.missing_graduation_year}",
+        f"Invalid graduation year: {summary.invalid_graduation_year}",
+        f"Graduation year out of range: {summary.graduation_year_out_of_range}",
         f"Duplicate emails: {summary.duplicate_email}",
         f"Duplicate applicant IDs: {summary.duplicate_applicant_id}",
+        f"Duplicate phones: {summary.duplicate_phone}",
         f"Flagged applications: {summary.flagged_applications} ({summary.flagged_rate}%)",
         f"Data quality average: {summary.data_quality_avg if summary.data_quality_avg is not None else 'n/a'}",
         f"Data quality range: {summary.data_quality_min if summary.data_quality_min is not None else 'n/a'} to {summary.data_quality_max if summary.data_quality_max is not None else 'n/a'}",
@@ -811,6 +1247,19 @@ def write_report(summary: Summary, path: Path) -> None:
     for program, count in sorted(summary.program_counts.items()):
         lines.append(f"- {program}: {count}")
     lines.append("")
+    lines.append("## Applications by school type")
+    if summary.school_type_counts:
+        for school_type in SCHOOL_TYPE_ORDER:
+            count = summary.school_type_counts.get(school_type)
+            if count is not None:
+                lines.append(f"- {school_type}: {count}")
+        for school_type, count in sorted(summary.school_type_counts.items()):
+            if school_type in SCHOOL_TYPE_ORDER:
+                continue
+            lines.append(f"- {school_type}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
     lines.append("## GPA by program")
     for program, avg in sorted(summary.program_gpa_avg.items()):
         lines.append(f"- {program}: {avg if avg is not None else 'n/a'}")
@@ -833,6 +1282,19 @@ def write_report(summary: Summary, path: Path) -> None:
     if summary.referral_source_counts:
         for source, count in sorted(summary.referral_source_counts.items()):
             lines.append(f"- {source}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Citizenship status mix")
+    if summary.citizenship_status_counts:
+        for status in CITIZENSHIP_STATUS_ORDER:
+            count = summary.citizenship_status_counts.get(status)
+            if count is not None:
+                lines.append(f"- {status}: {count}")
+        for status, count in sorted(summary.citizenship_status_counts.items()):
+            if status in CITIZENSHIP_STATUS_ORDER:
+                continue
+            lines.append(f"- {status}: {count}")
     else:
         lines.append("- n/a")
     lines.append("")
@@ -863,11 +1325,35 @@ def write_report(summary: Summary, path: Path) -> None:
     else:
         lines.append("- n/a")
     lines.append("")
+    lines.append("## Phone country mix")
+    if summary.phone_country_counts:
+        for country, count in sorted(summary.phone_country_counts.items()):
+            lines.append(f"- {country}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Contact channel mix")
+    if summary.contact_channel_counts:
+        for channel in CONTACT_CHANNEL_ORDER:
+            count = summary.contact_channel_counts.get(channel, 0)
+            lines.append(f"- {channel.replace('_', ' ').title()}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
     lines.append("## Submissions by weekday")
     if summary.submission_weekday_counts:
         for weekday in WEEKDAY_ORDER:
             count = summary.submission_weekday_counts.get(weekday, 0)
             lines.append(f"- {weekday}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Submissions by time of day")
+    if summary.submission_time_bucket_counts:
+        for bucket in SUBMISSION_TIME_BUCKET_ORDER:
+            count = summary.submission_time_bucket_counts.get(bucket, 0)
+            label = bucket.replace("_", " ").title()
+            lines.append(f"- {label}: {count}")
     else:
         lines.append("- n/a")
     lines.append("")
@@ -896,6 +1382,21 @@ def write_report(summary: Summary, path: Path) -> None:
     else:
         lines.append("- n/a")
     lines.append("")
+    lines.append("## Graduation year counts")
+    if summary.graduation_year_counts:
+        for year, count in sorted(summary.graduation_year_counts.items()):
+            lines.append(f"- {year}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
+    lines.append("## Graduation year buckets")
+    if summary.graduation_year_bucket_counts:
+        for bucket in GRADUATION_YEAR_BUCKETS:
+            count = summary.graduation_year_bucket_counts.get(bucket, 0)
+            lines.append(f"- {bucket.replace('_', ' ').title()}: {count}")
+    else:
+        lines.append("- n/a")
+    lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -909,18 +1410,27 @@ def follow_up_reason(flags: List[str]) -> str:
         "missing_name": "Missing applicant name",
         "missing_email": "Missing email",
         "invalid_email": "Invalid email",
+        "missing_phone": "Missing phone",
+        "invalid_phone": "Invalid phone",
         "missing_program": "Missing program",
+        "missing_school_type": "Missing school type",
         "missing_referral_source": "Missing referral source",
         "missing_income": "Missing income bracket",
+        "missing_citizenship_status": "Missing citizenship status",
+        "unrecognized_citizenship_status": "Unrecognized citizenship status",
         "low_gpa": "Low GPA",
         "invalid_gpa": "Invalid GPA format",
         "gpa_out_of_range": "GPA out of range",
+        "missing_graduation_year": "Missing graduation year",
+        "invalid_graduation_year": "Invalid graduation year",
+        "graduation_year_out_of_range": "Graduation year out of range",
         "invalid_submission_date": "Invalid submission date",
         "future_submission_date": "Submission date in future",
         "missing_submission_date": "Missing submission date",
         "stale_submission": f"Submission older than {STALE_SUBMISSION_DAYS} days",
         "duplicate_email": "Duplicate email",
         "duplicate_applicant_id": "Duplicate applicant ID",
+        "duplicate_phone": "Duplicate phone",
     }
     reasons = [labels.get(flag, flag.replace("_", " ").title()) for flag in flags]
     return "; ".join(reasons)
@@ -936,15 +1446,23 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "applicant_id": app.applicant_id,
                 "name": app.name,
                 "email": app.email or "",
+                "phone": app.phone or "",
+                "phone_normalized": app.phone_normalized or "",
+                "phone_country": app.phone_country or "",
                 "program": app.program,
+                "school_type": app.school_type or "",
+                "citizenship_status": app.citizenship_status or "",
                 "referral_source": app.referral_source or "",
                 "submission_date": app.submission_date or "",
                 "submission_age_days": app.submission_age_days if app.submission_age_days is not None else "",
                 "submission_age_bucket": app.submission_age_bucket or "",
                 "submission_recency": app.submission_recency,
+                "graduation_year": app.graduation_year if app.graduation_year is not None else "",
+                "graduation_year_bucket": app.graduation_year_bucket,
                 "flags": "; ".join(app.flags),
                 "flag_severity": app.flag_severity,
                 "review_status": app.review_status,
+                "review_priority": app.review_priority,
                 "data_quality_score": app.data_quality_score,
                 "quality_tier": quality_tier(app.data_quality_score),
                 "readiness_score": app.readiness_score,
@@ -959,20 +1477,120 @@ def write_issues(apps: List[NormalizedApplication], path: Path) -> None:
                 "applicant_id",
                 "name",
                 "email",
+                "phone",
+                "phone_normalized",
+                "phone_country",
                 "program",
+                "school_type",
+                "citizenship_status",
                 "referral_source",
                 "submission_date",
                 "submission_age_days",
                 "submission_age_bucket",
                 "submission_recency",
+                "graduation_year",
+                "graduation_year_bucket",
                 "flags",
                 "flag_severity",
                 "review_status",
+                "review_priority",
                 "data_quality_score",
                 "quality_tier",
                 "readiness_score",
                 "readiness_bucket",
                 "follow_up_reason",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def recommended_action(flags: List[str]) -> str:
+    if not flags:
+        return "Ready for review"
+    if any(flag in {"missing_email", "missing_phone"} for flag in flags):
+        return "Request missing contact details"
+    if any(flag in {"invalid_email", "invalid_phone"} for flag in flags):
+        return "Verify contact information"
+    if "missing_submission_date" in flags or "invalid_submission_date" in flags:
+        return "Confirm submission date"
+    if "missing_program" in flags:
+        return "Confirm program selection"
+    if "missing_school_type" in flags:
+        return "Capture school type"
+    if "missing_citizenship_status" in flags or "unrecognized_citizenship_status" in flags:
+        return "Confirm citizenship status"
+    if "missing_referral_source" in flags:
+        return "Capture referral source"
+    if any(flag in {"duplicate_email", "duplicate_applicant_id", "duplicate_phone"} for flag in flags):
+        return "Resolve possible duplicate"
+    if any(flag in {"low_gpa", "invalid_gpa", "gpa_out_of_range"} for flag in flags):
+        return "Review academic metrics"
+    if any(flag in {"missing_graduation_year", "invalid_graduation_year"} for flag in flags):
+        return "Confirm graduation year"
+    if "graduation_year_out_of_range" in flags:
+        return "Verify graduation year range"
+    if "stale_submission" in flags:
+        return "Check submission follow-up"
+    return "Review application notes"
+
+
+def write_followup_queue(apps: List[NormalizedApplication], path: Path) -> None:
+    priority_rank = {priority: index for index, priority in enumerate(REVIEW_PRIORITY_ORDER)}
+
+    def sort_key(app: NormalizedApplication) -> Tuple[int, int, str]:
+        rank = priority_rank.get(app.review_priority, len(priority_rank))
+        age_days = app.submission_age_days if app.submission_age_days is not None else -1
+        return (rank, -age_days, app.name.lower())
+
+    rows = []
+    for app in sorted(apps, key=sort_key):
+        if app.review_priority == "ready" and not app.flags:
+            continue
+        rows.append(
+            {
+                "applicant_id": app.applicant_id,
+                "name": app.name,
+                "email": app.email or "",
+                "phone": app.phone or "",
+                "program": app.program,
+                "school_type": app.school_type or "",
+                "citizenship_status": app.citizenship_status or "",
+                "review_status": app.review_status,
+                "review_priority": app.review_priority,
+                "flag_severity": app.flag_severity,
+                "data_quality_score": app.data_quality_score,
+                "readiness_score": app.readiness_score,
+                "submission_date": app.submission_date or "",
+                "submission_age_days": app.submission_age_days if app.submission_age_days is not None else "",
+                "submission_recency": app.submission_recency,
+                "graduation_year": app.graduation_year if app.graduation_year is not None else "",
+                "follow_up_reason": follow_up_reason(app.flags),
+                "recommended_action": recommended_action(app.flags),
+            }
+        )
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "applicant_id",
+                "name",
+                "email",
+                "phone",
+                "program",
+                "school_type",
+                "citizenship_status",
+                "review_status",
+                "review_priority",
+                "flag_severity",
+                "data_quality_score",
+                "readiness_score",
+                "submission_date",
+                "submission_age_days",
+                "submission_recency",
+                "graduation_year",
+                "follow_up_reason",
+                "recommended_action",
             ],
         )
         writer.writeheader()
@@ -997,14 +1615,19 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         program_gpa_avg=summary.program_gpa_avg,
         first_gen_program_counts=summary.first_gen_program_counts,
         first_gen_program_rates=summary.first_gen_program_rates,
+        school_type_counts=summary.school_type_counts,
         referral_source_counts=summary.referral_source_counts,
         income_bracket_counts=summary.income_bracket_counts,
         email_domain_counts=dict(
             sorted(summary.email_domain_counts.items(), key=lambda item: item[1], reverse=True)
         ),
         email_domain_category_counts=summary.email_domain_category_counts,
+        phone_country_counts=summary.phone_country_counts,
+        contact_channel_counts=summary.contact_channel_counts,
         note_tag_counts=summary.note_tag_counts,
+        citizenship_status_counts=summary.citizenship_status_counts,
         submission_weekday_counts=summary.submission_weekday_counts,
+        submission_time_bucket_counts=summary.submission_time_bucket_counts,
         review_status_counts=summary.review_status_counts,
         review_priority_counts=summary.review_priority_counts,
         flag_severity_counts=summary.flag_severity_counts,
@@ -1025,6 +1648,8 @@ def build_scorecard(apps: List[NormalizedApplication], summary: Summary) -> Scor
         submission_age_max=summary.submission_age_max,
         submission_age_bucket_counts=summary.submission_age_bucket_counts,
         submission_recency_counts=summary.submission_recency_counts,
+        graduation_year_counts=summary.graduation_year_counts,
+        graduation_year_bucket_counts=summary.graduation_year_bucket_counts,
         submission_start=summary.submission_start,
         submission_end=summary.submission_end,
     )
@@ -1036,12 +1661,13 @@ def run(
     report_path: Path,
     issues_path: Optional[Path],
     scorecard_path: Optional[Path],
+    queue_path: Optional[Path],
 ) -> Tuple[int, int]:
     rows = read_applications(input_path)
     apps = [normalize_row(row) for row in rows]
-    duplicate_email, duplicate_applicant_id = apply_duplicate_flags(apps)
+    duplicate_email, duplicate_applicant_id, duplicate_phone = apply_duplicate_flags(apps)
     update_review_status(apps)
-    summary = build_summary(apps, duplicate_email, duplicate_applicant_id)
+    summary = build_summary(apps, duplicate_email, duplicate_applicant_id, duplicate_phone)
     ensure_parent(out_path)
     ensure_parent(report_path)
     write_json(apps, out_path)
@@ -1049,6 +1675,9 @@ def run(
     if issues_path:
         ensure_parent(issues_path)
         write_issues(apps, issues_path)
+    if queue_path:
+        ensure_parent(queue_path)
+        write_followup_queue(apps, queue_path)
     if scorecard_path:
         ensure_parent(scorecard_path)
         scorecard = build_scorecard(apps, summary)
@@ -1062,14 +1691,15 @@ def run_with_db(
     report_path: Path,
     issues_path: Optional[Path],
     scorecard_path: Optional[Path],
+    queue_path: Optional[Path],
     db_url: Optional[str],
     batch_label: Optional[str],
 ) -> Tuple[int, int, str]:
     rows = read_applications(input_path)
     apps = [normalize_row(row) for row in rows]
-    duplicate_email, duplicate_applicant_id = apply_duplicate_flags(apps)
+    duplicate_email, duplicate_applicant_id, duplicate_phone = apply_duplicate_flags(apps)
     update_review_status(apps)
-    summary = build_summary(apps, duplicate_email, duplicate_applicant_id)
+    summary = build_summary(apps, duplicate_email, duplicate_applicant_id, duplicate_phone)
     ensure_parent(out_path)
     ensure_parent(report_path)
     write_json(apps, out_path)
@@ -1077,6 +1707,9 @@ def run_with_db(
     if issues_path:
         ensure_parent(issues_path)
         write_issues(apps, issues_path)
+    if queue_path:
+        ensure_parent(queue_path)
+        write_followup_queue(apps, queue_path)
     if scorecard_path:
         ensure_parent(scorecard_path)
         scorecard = build_scorecard(apps, summary)
@@ -1094,6 +1727,7 @@ def main() -> None:
     parser.add_argument("--out", required=True, help="Path to write normalized JSON")
     parser.add_argument("--report", required=True, help="Path to write summary report")
     parser.add_argument("--issues", help="Optional path to write flagged applications CSV")
+    parser.add_argument("--queue", help="Optional path to write follow-up queue CSV")
     parser.add_argument("--scorecard", help="Optional path to write scorecard JSON")
     parser.add_argument("--db", action="store_true", help="Also export normalized data to Postgres")
     parser.add_argument("--db-url", help="Optional database URL override")
@@ -1101,6 +1735,7 @@ def main() -> None:
     args = parser.parse_args()
 
     issues_path = Path(args.issues) if args.issues else None
+    queue_path = Path(args.queue) if args.queue else None
     scorecard_path = Path(args.scorecard) if args.scorecard else None
     if args.db:
         count, programs, batch_id = run_with_db(
@@ -1109,6 +1744,7 @@ def main() -> None:
             Path(args.report),
             issues_path,
             scorecard_path,
+            queue_path,
             args.db_url,
             args.batch_label,
         )
@@ -1121,6 +1757,7 @@ def main() -> None:
             Path(args.report),
             issues_path,
             scorecard_path,
+            queue_path,
         )
         print(f"Normalized {count} applications across {programs} programs.")
 

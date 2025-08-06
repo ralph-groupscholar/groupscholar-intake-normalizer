@@ -10,7 +10,10 @@
     "duplicate_email": 0.25,
     "duplicate_applicant_id": 0.25,
     "stale_submission": 0.25,
+    "invalid_phone": 0.125,
+    "graduation_year_out_of_range": 0.25,
     "missing_name": 0.125,
+    "missing_phone": 0.125,
     "invalid_email": 0.125,
     "missing_program": 0.125,
     "gpa_out_of_range": 0.125
@@ -61,38 +64,57 @@
     "Monday": 4,
     "Thursday": 1
   },
+  "submission_time_bucket_counts": {
+    "unknown": 8
+  },
   "review_status_counts": {
-    "needs_follow_up": 4,
-    "incomplete": 4
+    "needs_follow_up": 3,
+    "incomplete": 4,
+    "needs_review": 1
   },
   "review_priority_counts": {
-    "low": 4,
-    "high": 4
+    "low": 3,
+    "high": 4,
+    "medium": 1
   },
   "flag_severity_counts": {
-    "medium": 4,
-    "critical": 4
+    "medium": 3,
+    "critical": 4,
+    "high": 1
   },
   "email_domain_category_counts": {
     "commercial": 6,
     "missing": 1,
     "invalid": 1
   },
-  "data_quality_avg": 76.2,
-  "data_quality_min": 60,
+  "phone_country_counts": {
+    "US/Canada": 4,
+    "United Kingdom": 1,
+    "invalid": 1,
+    "missing": 1,
+    "India": 1
+  },
+  "contact_channel_counts": {
+    "email_and_phone": 4,
+    "phone_only": 2,
+    "email_only": 2
+  },
+  "data_quality_avg": 72.5,
+  "data_quality_min": 55,
   "data_quality_max": 95,
   "quality_tier_counts": {
-    "excellent": 3,
+    "excellent": 2,
     "needs_attention": 4,
-    "good": 1
+    "good": 2
   },
-  "readiness_avg": 67.1,
-  "readiness_min": 46,
+  "readiness_avg": 61.4,
+  "readiness_min": 38,
   "readiness_max": 92,
   "readiness_bucket_counts": {
     "ready": 1,
     "needs_review": 4,
-    "needs_follow_up": 3
+    "needs_follow_up": 2,
+    "incomplete": 1
   },
   "gpa_avg": 3.38,
   "gpa_min": 2.4,
@@ -111,6 +133,20 @@
     "active": 5,
     "stale": 2,
     "fresh": 1
+  },
+  "graduation_year_counts": {
+    "2026": 3,
+    "2027": 1,
+    "2025": 1,
+    "2024": 1,
+    "2033": 1,
+    "2028": 1
+  },
+  "graduation_year_bucket_counts": {
+    "current": 3,
+    "next_year": 1,
+    "overdue": 2,
+    "future": 2
   },
   "submission_start": "2025-12-29",
   "submission_end": "2026-02-02"

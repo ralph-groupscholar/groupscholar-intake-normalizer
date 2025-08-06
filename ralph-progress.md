@@ -72,3 +72,18 @@
 - Added first-gen participation rates overall and by program to summaries and scorecards.
 - Extended batch schema/export to persist first-gen rates and program-level first-gen mix.
 - Regenerated sample outputs and expanded tests to cover first-gen rate metrics.
+
+## Iteration 178
+- Restored phone capture + normalization with country mix reporting and follow-up flags.
+- Extended Postgres schema + exports for phone fields and country mix in batch analytics.
+- Refreshed sample intake data, outputs, and tests to cover phone normalization paths.
+
+## Iteration 175
+- Added duplicate phone detection with summary/report visibility and follow-up labeling.
+- Extended batch schema + exports for duplicate phone counts and refreshed sample outputs.
+- Reseeded the production intake_normalizer batch with duplicate phone tracking enabled.
+
+## Iteration 173
+- Added graduation year coverage assertions to the summary/scorecard tests.
+- Regenerated sample outputs so graduation year sections are present in reports.
+- Updated intake field documentation to include referral source and graduation year.

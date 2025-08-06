@@ -7,7 +7,7 @@ Normalize scholarship intake CSV files into a consistent JSON payload with light
 - Parses an intake CSV and standardizes fields (dates, program names, booleans).
 - Normalizes column headers (common aliases) to reduce prep work.
 - Generates a normalized JSON dataset for downstream dashboards.
-- Produces a summary report with risk flags, review readiness tiers, readiness scores, data quality tiers, GPA stats, income bracket mix, first-gen mix (overall + by program), submission window, duplicate counts, eligibility note tags, email domain mix, email domain categories, submission weekday counts, submission age buckets, and submission recency.
+- Produces a summary report with risk flags, review readiness tiers, readiness scores, data quality tiers, GPA stats, income bracket mix, first-gen mix (overall + by program), school type mix, submission window, duplicate counts, eligibility note tags, email domain mix, email domain categories, phone country mix, contact channel mix, submission weekday counts, submission age buckets, submission recency, and graduation year mix.
 - Optional scorecard JSON for downstream QA automation.
 - Flags missing programs and out-of-range GPAs for follow-up and assigns review readiness tiers.
 
@@ -19,6 +19,7 @@ python3 src/normalizer.py \
   --out output/normalized.json \
   --report output/summary.md \
   --issues output/issues.csv \
+  --queue output/followup_queue.csv \
   --scorecard output/scorecard.json
 ```
 
@@ -34,6 +35,7 @@ python3 src/normalizer.py \
   --out output/normalized.json \
   --report output/summary.md \
   --issues output/issues.csv \
+  --queue output/followup_queue.csv \
   --scorecard output/scorecard.json \
   --db \
   --batch-label "Sample intake"
@@ -46,7 +48,8 @@ python3 src/normalizer.py \
 
 - `output/normalized.json` with normalized rows + computed flags, review readiness tiers, readiness scores, and data quality scores.
 - `output/summary.md` with a one-page intake snapshot, data quality tiers, eligibility note tag counts, email domain mix, submission weekday counts, submission age buckets, and submission recency.
-- `output/issues.csv` with only the applications that need follow-up, including review status.
+- `output/issues.csv` with only the applications that need follow-up, including review status and graduation year.
+- `output/followup_queue.csv` with prioritized follow-ups, recommended actions, and review readiness signals.
 - `output/scorecard.json` with rates + aggregates for QA dashboards and note tag counts.
 
 ## Fields (input)
@@ -56,10 +59,15 @@ Expected columns in the intake CSV:
 - applicant_id
 - name
 - email
+- phone
 - program
+- school_type
+- citizenship_status
+- referral_source
 - gpa
 - income_bracket
 - submission_date
+- graduation_year
 - first_gen
 - eligibility_notes
 
