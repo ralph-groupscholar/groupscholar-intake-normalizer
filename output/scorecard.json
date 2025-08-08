@@ -42,6 +42,14 @@
     "Health Futures": 0.0,
     "Unspecified": 0.0
   },
+  "school_type_counts": {
+    "Public": 3,
+    "Private": 1,
+    "Charter": 1,
+    "Homeschool": 1,
+    "International": 1,
+    "Community College": 1
+  },
   "referral_source_counts": {},
   "income_bracket_counts": {
     "<=40k": 4,
@@ -98,6 +106,13 @@
     "email_and_phone": 4,
     "phone_only": 2,
     "email_only": 2
+  },
+  "citizenship_status_counts": {
+    "US Citizen": 4,
+    "International": 1,
+    "Permanent Resident": 1,
+    "DACA": 1,
+    "Undocumented": 1
   },
   "data_quality_avg": 72.5,
   "data_quality_min": 55,

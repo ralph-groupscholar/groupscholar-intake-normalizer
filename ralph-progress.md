@@ -87,3 +87,8 @@
 - Added graduation year coverage assertions to the summary/scorecard tests.
 - Regenerated sample outputs so graduation year sections are present in reports.
 - Updated intake field documentation to include referral source and graduation year.
+
+## Iteration 178
+- Added school type and citizenship status normalization, reporting, and follow-up context (summary, scorecard, issues, queue).
+- Extended Postgres schema + exports for school type and citizenship status analytics, then reseeded the production intake_normalizer batch.
+- Refreshed sample intake data, outputs, and unit tests to cover school type and citizenship status coverage.

@@ -8,8 +8,11 @@ Invalid email: 1
 Missing phone: 1
 Invalid phone: 1
 Missing program: 1
+Missing school type: 0
 Missing referral source: 8
 Missing income: 1
+Missing citizenship status: 0
+Unrecognized citizenship status: 0
 Low GPA (<2.5): 1
 Invalid GPA: 0
 GPA out of range: 1
@@ -71,6 +74,14 @@ Submission window: 2025-12-29 to 2026-02-02
 - STEM Scholars: 3
 - Unspecified: 1
 
+## Applications by school type
+- Public: 3
+- Charter: 1
+- Private: 1
+- Homeschool: 1
+- Community College: 1
+- International: 1
+
 ## GPA by program
 - Arts Catalyst: 2.65
 - Health Futures: 3.65
@@ -90,6 +101,13 @@ Submission window: 2025-12-29 to 2026-02-02
 
 ## Applications by referral source
 - n/a
+
+## Citizenship status mix
+- US Citizen: 4
+- Permanent Resident: 1
+- DACA: 1
+- International: 1
+- Undocumented: 1
 
 ## Eligibility note tags
 - Documents Complete: 1
